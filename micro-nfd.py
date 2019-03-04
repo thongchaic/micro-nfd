@@ -6,27 +6,37 @@ import ubinascii
 import socket
 from machine import Pin
 
-p0 = Pin(0, Pin.OUT)
-p22 = Pin(22, Pin.OUT)
+p0      =   Pin(0, Pin.OUT)
+p22     =   Pin(22, Pin.OUT)
+APNAME  =   "NDN_"
+GROUP_PASSWORD = 'micropythoN'
+
 p0.off()
 p22.off()
 
-def start_ap():
+
+def init(mac):
     ap = network.WLAN(network.AP_IF)
     ap.active(True)
+
     ap.ifconfig(('4.4.4.4', '255.255.255.0', '4.4.4.4', '1.1.1.1'))
-    ap.config(essid='NDN1',password='micropythoN',channel=16)
+    mac = ubinascii.hexlify(ap.config('mac'),'').decode()
+    APNAME = APNAME+str(mac)
+    ap.config(essid=APNAME,password=GROUP_PASSWORD) #channel=16
     print(ap.config('essid'))
     print(ap.config('channel'))
     print(ap.ifconfig())
     p0.off()
 
+
+
+
 def do_connect():
     wlan = network.WLAN(network.STA_IF)
     wlan.active(True)
     if not wlan.isconnected():
-        #wlan.connect('PNHome2', 'st11ae58*')
-        wlan.connect('science_3_2_2.4G')
+        wlan.connect('PNHome2', 'st11ae58*')
+        #wlan.connect('science_3_2_2.4G')
         while not wlan.isconnected():
             time.sleep(2)
             print('Trying to connect PNHome2')
@@ -72,12 +82,12 @@ def nfd():
             
         except:
             print("interupted ... ")
-	    break
+            break
 
 if __name__ == '__main__':
     p0.on()
     p22.on()
-    start_ap()
+    init()
     do_connect()
     #nfd()
 
