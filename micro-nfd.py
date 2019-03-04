@@ -4,32 +4,31 @@ import machine
 import network
 import ubinascii
 import socket
+import random
+from face import Face 
 from machine import Pin
 
 p0      =   Pin(0, Pin.OUT)
 p22     =   Pin(22, Pin.OUT)
-APNAME  =   "NDN_"
 GROUP_PASSWORD = 'micropythoN'
-
+APNAME = None
 p0.off()
 p22.off()
 
-
-def init(mac):
+def init():
     ap = network.WLAN(network.AP_IF)
     ap.active(True)
-
-    ap.ifconfig(('4.4.4.4', '255.255.255.0', '4.4.4.4', '1.1.1.1'))
+    ap_ip_group = '4.'+str(random.randrange(4,254))+'.'+str(random.randrange(4,254))+'.1'
+    ap.ifconfig((ap_ip_group, '255.255.255.0', ap_ip_group, '8.8.8.8'))
     mac = ubinascii.hexlify(ap.config('mac'),'').decode()
-    APNAME = APNAME+str(mac)
+
+    APNAME =  "NDN_"+str(mac)
+
     ap.config(essid=APNAME,password=GROUP_PASSWORD) #channel=16
     print(ap.config('essid'))
     print(ap.config('channel'))
     print(ap.ifconfig())
     p0.off()
-
-
-
 
 def do_connect():
     wlan = network.WLAN(network.STA_IF)
@@ -42,8 +41,8 @@ def do_connect():
             print('Trying to connect PNHome2')
             pass
 
-    #wlan.ifconfig(('192.168.1.17', '255.255.255.0', '192.168.1.1', '1.1.1.1')) #HOME
-    wlan.ifconfig(('192.168.6.195', '255.255.255.0', '192.168.6.254', '192.168.100.20')) #SRRU
+    wlan.ifconfig(('192.168.1.17', '255.255.255.0', '192.168.1.1', '1.1.1.1')) #HOME
+    #wlan.ifconfig(('192.168.6.195', '255.255.255.0', '192.168.6.254', '192.168.100.20')) #SRRU
     mac = ubinascii.hexlify(wlan.config('mac'),':').decode()
     print(wlan.ifconfig(), mac)
     p22.off()
