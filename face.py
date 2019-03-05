@@ -44,7 +44,6 @@ class Face:
     def do_send(self,payload,address):
         print('....')
 
-
     def reassembly(self):
         print("------TODO--------")
 
@@ -57,18 +56,19 @@ class Face:
             print('invalid interest/data')
             return 
 
-        print('pl=>',payload)
+        print('pl=>',payload,' : ',payload[0])
+
         t,c,i,l = ndn.parse_tcilv(payload[0],payload[1:2],payload[3:4])
         if t == ndn.TLV_INTEREST:
             print("incoming Interest=>",payload)
             if self.on_Interest is not None:
-                print('calling back Interest')
-                #self.on_Interest(payload[5::])
+                print('callback pl=>',payload[5::])
+                self.on_Interest(payload[5::])
 
         elif t == ndn.TLV_DATA:
             print("incoming Data=>",payload)
             if self.on_Data is not None:
-                print("call back data")
+                self.on_Data(payload[5::])
         else:
             print('unsolicited interest/data')
 

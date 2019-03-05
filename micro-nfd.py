@@ -34,15 +34,15 @@ def do_connect():
     wlan = network.WLAN(network.STA_IF)
     wlan.active(True)
     if not wlan.isconnected():
-        wlan.connect('PNHome2', 'st11ae58*')
-        #wlan.connect('science_3_2_2.4G')
+        #wlan.connect('PNHome2', 'st11ae58*')
+        wlan.connect('science_3_2_2.4G')
         while not wlan.isconnected():
             time.sleep(2)
             print('Trying to connect PNHome2')
             pass
 
-    wlan.ifconfig(('192.168.1.17', '255.255.255.0', '192.168.1.1', '1.1.1.1')) #HOME
-    #wlan.ifconfig(('192.168.6.195', '255.255.255.0', '192.168.6.254', '192.168.100.20')) #SRRU
+    #wlan.ifconfig(('192.168.1.17', '255.255.255.0', '192.168.1.1', '1.1.1.1')) #HOME
+    wlan.ifconfig(('192.168.6.195', '255.255.255.0', '192.168.6.254', '192.168.100.20')) #SRRU
     mac = ubinascii.hexlify(wlan.config('mac'),':').decode()
     print(wlan.ifconfig(), mac)
     p22.off()
