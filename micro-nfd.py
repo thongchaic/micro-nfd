@@ -14,35 +14,75 @@ GROUP_PASSWORD = 'micropythoN'
 APNAME = None
 p0.off()
 p22.off()
+wlan = network.WLAN(network.STA_IF)
+faces = []
 
 def init():
     ap = network.WLAN(network.AP_IF)
     ap.active(True)
     ap_ip_group = '4.'+str(random.randrange(4,254))+'.'+str(random.randrange(4,254))+'.1'
     ap.ifconfig((ap_ip_group, '255.255.255.0', ap_ip_group, '8.8.8.8'))
-    mac = ubinascii.hexlify(ap.config('mac'),'').decode()
-
+    mac = ubinascii.hexlify(ap.config('mac')).decode()
     APNAME =  "NDN_"+str(mac)
-
     ap.config(essid=APNAME,password=GROUP_PASSWORD) #channel=16
     print(ap.config('essid'))
     print(ap.config('channel'))
     print(ap.ifconfig())
     p0.off()
 
-def do_connect():
+    #
+def create_face(ssid,wifi):
+    #wlan = network.WLAN(network.STA_IF)
+    mac = ubinascii.hexlify(wifi[1]).decode()
+    print(mac, wlan)
+
+    #
+    #print("Connecting to ",ssid,mac)
+    #
+    wlan.connect(ssid,GROUP_PASSWORD)
+
+def find_neighbors():
+    wlan.disconnect()
+    nets = wlan.scan()
+    selected_ssid = None
+
+    for i,n in enumerate(nets):
+        ssid = str(n[0], "utf-8", "ignore")
+        mac = ubinascii.hexlify(n[1]).decode()
+        dbm = int(n[3])
+        if dbm > -50 and dbm < -20:
+            selected_ssid = ssid
+            print("GOOD_DBM_FOUND:",selected_ssid)
+        
+        
+        print('NDN_[',i,']=>',ssid,",",mac,",",dbm," : ",n)
+
+    if selected_ssid is None:
+        if len(nets) > 0:
+            do_connect( str(nets[0][0], "utf-8", "ignore") )
+        else:
+            find_neighbors()
+    else:
+        do_connect( selected_ssid )
+
+def do_connect(ssid=None):
+    
+    print("Selected SSID:",ssid)
     wlan = network.WLAN(network.STA_IF)
     wlan.active(True)
     if not wlan.isconnected():
-        #wlan.connect('PNHome2', 'st11ae58*')
-        wlan.connect('science_3_2_2.4G')
+        wlan.connect('PNHome2', 'st11ae58*')
+        #wlan.connect('science_3_2_2.4G')
         while not wlan.isconnected():
-            time.sleep(2)
             print('Trying to connect PNHome2')
+            #wlan.connect('science_3_2_2.4G')
+            wlan.connect('PNHome2', 'st11ae58*')
+            #wlan.connect('CACTUS4_2', 'cactus6444')
+            time.sleep(2)
             pass
 
-    #wlan.ifconfig(('192.168.1.17', '255.255.255.0', '192.168.1.1', '1.1.1.1')) #HOME
-    wlan.ifconfig(('192.168.6.195', '255.255.255.0', '192.168.6.254', '192.168.100.20')) #SRRU
+    wlan.ifconfig(('192.168.1.17', '255.255.255.0', '192.168.1.1', '1.1.1.1')) #HOME
+    #wlan.ifconfig(('192.168.6.110', '255.255.255.0', '192.168.6.254', '192.168.100.20')) #SRRU
     mac = ubinascii.hexlify(wlan.config('mac'),':').decode()
     print(wlan.ifconfig(), mac)
     p22.off()
@@ -87,6 +127,8 @@ if __name__ == '__main__':
     p0.on()
     p22.on()
     init()
-    do_connect()
+   
+    find_neighbors()
+    #do_connect()
     #nfd()
 
