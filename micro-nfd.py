@@ -50,12 +50,13 @@ def find_neighbors():
         ssid = str(n[0], "utf-8", "ignore")
         mac = ubinascii.hexlify(n[1]).decode()
         dbm = int(n[3])
-        if dbm > -50 and dbm < -20:
+        if ssid.startswith("NDN_"):
+            print('NDN_[',i,']=>',ssid,",",mac,",",dbm," : ",n)
             selected_ssid = ssid
-            print("GOOD_DBM_FOUND:",selected_ssid)
-        
-        
-        print('NDN_[',i,']=>',ssid,",",mac,",",dbm," : ",n)
+            if dbm > -50 and dbm < -20 and selected_ssid is None:
+                print("GOOD_DBM_FOUND:",selected_ssid)
+                break
+            
 
     if selected_ssid is None:
         if len(nets) > 0:
@@ -73,6 +74,7 @@ def do_connect(ssid=None):
     if not wlan.isconnected():
         wlan.connect('PNHome2', 'st11ae58*')
         #wlan.connect('science_3_2_2.4G')
+        #wlan.connect(ssid, GROUP_PASSWORD)
         while not wlan.isconnected():
             print('Trying to connect PNHome2')
             #wlan.connect('science_3_2_2.4G')
