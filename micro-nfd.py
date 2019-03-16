@@ -6,6 +6,7 @@ import ubinascii
 import socket
 import random
 from face import Face 
+from fib import Fib 
 from machine import Pin
 
 p0      =   Pin(0, Pin.OUT)
@@ -88,6 +89,9 @@ def do_connect(ssid=None):
     mac = ubinascii.hexlify(wlan.config('mac'),':').decode()
     print(wlan.ifconfig(), mac)
     p22.off()
+
+def on_Interest(payload):
+    print("Interest=>",payload)
 
 def to_producer(data, address,s):
     raspi = socket.getaddrinfo('192.168.1.18', 6363)[0][-1]

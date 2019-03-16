@@ -6,22 +6,23 @@ import ndn
 
 class Face:
 
-    def __init__(self,address,mtu):
+    def __init__(self,mtu):
         print("#Face init")
         self.on_Interest = None
         self.on_Data = None 
-        self.address = address
+        
         self.stop = False
         self.MTU = mtu
-        self.dgram_fid = self.generate_face_id()
+        self.fid = self.generate_face_id()
         self.fragments = [] # in a tuble (index,length,data)
-        print("Face init [address:",self.address,", MTU:",self.MTU,", FID:",self.dgram_fid)
+        print("Face init [, MTU:",self.MTU,", FID:",self.fid)
 
-    def start_dgram_face(self):
-        self.dgram_fid = self.generate_face_id()
+    def start_dgram_face(self,address):
+        self.address = address
         _thread.start_new_thread(self.start_face,())
         print("#Face dgram_face started...")
-
+        return self.fid
+        
     def start_l2_face(self):
         print("-------TODO-------")
 
