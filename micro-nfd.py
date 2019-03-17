@@ -6,7 +6,7 @@ import ubinascii
 import socket
 import random
 from face import Face 
-from fib import Fib 
+#from fib import Fib 
 from machine import Pin
 
 p0      =   Pin(0, Pin.OUT)
@@ -17,6 +17,8 @@ p0.off()
 p22.off()
 wlan = network.WLAN(network.STA_IF)
 faces = []
+
+#fibs = Fib
 
 def init():
     ap = network.WLAN(network.AP_IF)
@@ -51,14 +53,16 @@ def find_neighbors():
         ssid = str(n[0], "utf-8", "ignore")
         mac = ubinascii.hexlify(n[1]).decode()
         dbm = int(n[3])
+        print('NDN_[',i,']=>',ssid,",",mac,",",dbm," : ",n," | ",selected_ssid)
+        '''
         if ssid.startswith("NDN_"):
             print('NDN_[',i,']=>',ssid,",",mac,",",dbm," : ",n)
             selected_ssid = ssid
             if dbm > -50 and dbm < -20 and selected_ssid is None:
                 print("GOOD_DBM_FOUND:",selected_ssid)
                 break
-            
-
+        '''
+    '''
     if selected_ssid is None:
         if len(nets) > 0:
             do_connect( str(nets[0][0], "utf-8", "ignore") )
@@ -66,32 +70,47 @@ def find_neighbors():
             find_neighbors()
     else:
         do_connect( selected_ssid )
+    '''
+    do_connect( "CSOffice2" )#Test
 
 def do_connect(ssid=None):
     
+    if ssid is None:
+        find_neighbors()
+
     print("Selected SSID:",ssid)
-    wlan = network.WLAN(network.STA_IF)
+    #wlan = network.WLAN(network.STA_IF)
     wlan.active(True)
     if not wlan.isconnected():
-        wlan.connect('PNHome2', 'st11ae58*')
-        #wlan.connect('science_3_2_2.4G')
+        #wlan.connect('PNHome2', 'st11ae58*')
         #wlan.connect(ssid, GROUP_PASSWORD)
         while not wlan.isconnected():
             print('Trying to connect PNHome2')
             #wlan.connect('science_3_2_2.4G')
-            wlan.connect('PNHome2', 'st11ae58*')
+            #wlan.connect('PNHome2', 'st11ae58*')
+            wlan.connect(ssid)
             #wlan.connect('CACTUS4_2', 'cactus6444')
             time.sleep(2)
             pass
-
-    wlan.ifconfig(('192.168.1.17', '255.255.255.0', '192.168.1.1', '1.1.1.1')) #HOME
+    
+    #wlan.ifconfig(('192.168.1.17', '255.255.255.0', '192.168.1.1', '1.1.1.1')) #HOME
     #wlan.ifconfig(('192.168.6.110', '255.255.255.0', '192.168.6.254', '192.168.100.20')) #SRRU
     mac = ubinascii.hexlify(wlan.config('mac'),':').decode()
     print(wlan.ifconfig(), mac)
     p22.off()
 
 def on_Interest(payload):
-    print("Interest=>",payload)
+    print("Interest[MAIN]=>",payload)
+
+def init_nfd():
+    print("Start DGRAM face")
+    dgram_face = Face(1500)
+    dgram_face.on_Interest = on_Interest
+    
+    fid = dgram_face.start_dgram_face('0.0.0.0')
+    print("DGRAM_FID=",fid)
+    
+    #fibs = Fib("0.0.0.0")
 
 def to_producer(data, address,s):
     raspi = socket.getaddrinfo('192.168.1.18', 6363)[0][-1]
@@ -135,6 +154,9 @@ if __name__ == '__main__':
     init()
    
     find_neighbors()
+
+    init_nfd()
+
     #do_connect()
     #nfd()
 

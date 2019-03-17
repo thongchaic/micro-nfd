@@ -5,7 +5,7 @@ import time
 import ndn
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-server_address = ('192.168.6.153', 6363)
+server_address = ('192.168.6.105', 6363)
 
 def test_send():
         c = 1
