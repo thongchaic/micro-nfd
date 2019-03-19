@@ -58,7 +58,7 @@ class Face:
             print('invalid interest/data')
             return 
 
-        print('pl=>',payload,' : ',payload[0])
+        #print('pl=>',payload,' : ',payload[0])
 
         t,c,i,l = ndn.parse_tcilv(payload[0],payload[1],payload[2:4])
         if t == ndn.TLV_INTEREST:

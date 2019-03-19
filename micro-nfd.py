@@ -6,7 +6,7 @@ import ubinascii
 import socket
 import random
 from face import Face 
-#from fib import Fib 
+from fib import Fib 
 from machine import Pin
 
 p0      =   Pin(0, Pin.OUT)
@@ -16,7 +16,7 @@ APNAME = None
 p0.off()
 p22.off()
 wlan = network.WLAN(network.STA_IF)
-faces = []
+fibs = Fib()
 
 #fibs = Fib
 
@@ -33,15 +33,12 @@ def init():
     print(ap.ifconfig())
     p0.off()
 
-    #
 def create_face(ssid,wifi):
     #wlan = network.WLAN(network.STA_IF)
     mac = ubinascii.hexlify(wifi[1]).decode()
     print(mac, wlan)
-
-    #
     #print("Connecting to ",ssid,mac)
-    #
+
     wlan.connect(ssid,GROUP_PASSWORD)
 
 def find_neighbors():
@@ -54,6 +51,7 @@ def find_neighbors():
         mac = ubinascii.hexlify(n[1]).decode()
         dbm = int(n[3])
         print('NDN_[',i,']=>',ssid,",",mac,",",dbm," : ",n," | ",selected_ssid)
+
         '''
         if ssid.startswith("NDN_"):
             print('NDN_[',i,']=>',ssid,",",mac,",",dbm," : ",n)
@@ -78,15 +76,16 @@ def do_connect(ssid=None):
     if ssid is None:
         find_neighbors()
 
-    print("Selected SSID:",ssid)
+    #print("Selected SSID:",ssid)
     #wlan = network.WLAN(network.STA_IF)
     wlan.active(True)
+    
     if not wlan.isconnected():
         #wlan.connect('PNHome2', 'st11ae58*')
         #wlan.connect(ssid, GROUP_PASSWORD)
         while not wlan.isconnected():
             print('Trying to connect PNHome2')
-            #wlan.connect('science_3_2_2.4G')
+            #wlan.connect('CSOffice2')
             #wlan.connect('PNHome2', 'st11ae58*')
             wlan.connect(ssid)
             #wlan.connect('CACTUS4_2', 'cactus6444')
@@ -99,17 +98,21 @@ def do_connect(ssid=None):
     print(wlan.ifconfig(), mac)
     p22.off()
 
-def on_Interest(payload):
-    print("Interest[MAIN]=>",payload)
+def on_Interest(interest):
+    print("Incoming Interest[MAIN]=>",interest)
+
+def on_Data(data):
+    print("Incoming Data[MAIN]=>",data)
 
 def init_nfd():
     print("Start DGRAM face")
     dgram_face = Face(1500)
     dgram_face.on_Interest = on_Interest
+    dgram_face.on_Data = on_Data
     
     fid = dgram_face.start_dgram_face('0.0.0.0')
     print("DGRAM_FID=",fid)
-    
+
     #fibs = Fib("0.0.0.0")
 
 def to_producer(data, address,s):

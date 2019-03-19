@@ -5,7 +5,7 @@ import time
 import ndn
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-server_address = ('192.168.6.105', 6363)
+server_address = ('192.168.1.19', 6363)
 
 def test_send():
         c = 1
@@ -15,7 +15,6 @@ def test_send():
                         name = "/ndn/th/ac/srru/good2cu*99/"+str(c)
                         name_len = len(name)
                         pkt_len = ''
-
                         x = name_len&0x00FF
                         y = name_len&0xFF00
                         y >>= 8
