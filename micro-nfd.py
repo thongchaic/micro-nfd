@@ -8,6 +8,7 @@ import random
 from face import Face 
 from fib import Fib 
 from machine import Pin
+import mutils
 
 p0      =   Pin(0, Pin.OUT)
 p22     =   Pin(22, Pin.OUT)
@@ -15,18 +16,27 @@ GROUP_PASSWORD = 'micropythoN'
 APNAME = None
 p0.off()
 p22.off()
+
 wlan = network.WLAN(network.STA_IF)
+UUID = ubinascii.hexlify(machine.unique_id()).decode()
+EUI = mutils.mac2eui(UUID)
 fibs = Fib()
 
 #fibs = Fib
 
 def init():
+
+    print("-----------------")
+    print('UUID: ',UUID)
+    print('EUI : ',EUI)
+    print("-----------------")
+
     ap = network.WLAN(network.AP_IF)
     ap.active(True)
     ap_ip_group = '4.'+str(random.randrange(4,254))+'.'+str(random.randrange(4,254))+'.1'
     ap.ifconfig((ap_ip_group, '255.255.255.0', ap_ip_group, '8.8.8.8'))
     mac = ubinascii.hexlify(ap.config('mac')).decode()
-    APNAME =  "NDN_"+str(mac)
+    APNAME =  "NDN_"+str(EUI)
     ap.config(essid=APNAME,password=GROUP_PASSWORD) #channel=16
     print(ap.config('essid'))
     print(ap.config('channel'))
@@ -38,7 +48,6 @@ def create_face(ssid,wifi):
     mac = ubinascii.hexlify(wifi[1]).decode()
     print(mac, wlan)
     #print("Connecting to ",ssid,mac)
-
     wlan.connect(ssid,GROUP_PASSWORD)
 
 def find_neighbors():
