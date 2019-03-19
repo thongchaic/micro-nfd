@@ -37,9 +37,7 @@ lora = controller.add_transceiver(SX127x(name = EUI),
 #fibs = Fib
 
 def init():
-
-   
-
+    
     print('------ init ap -----')
     ap = network.WLAN(network.AP_IF)
     ap.active(True)

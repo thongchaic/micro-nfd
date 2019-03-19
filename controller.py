@@ -1,6 +1,5 @@
 from time import sleep
 
-
 class Controller:
 
     class Mock:
@@ -24,7 +23,6 @@ class Controller:
     PIN_ID_FOR_LORA_DIO4 = None
     PIN_ID_FOR_LORA_DIO5 = None
 
-
     def __init__(self,
                  pin_id_led = ON_BOARD_LED_PIN_NO,
                  on_board_led_high_is_on = ON_BOARD_LED_HIGH_IS_ON,
@@ -37,7 +35,6 @@ class Controller:
         self.reset_pin(self.pin_reset)
         self.transceivers = {}
         self.blink_led(*blink_on_start)
-
 
     def add_transceiver(self,
                         transceiver,
@@ -113,7 +110,6 @@ class Controller:
             sleep(on_seconds)
             self.led_on(False)
             sleep(off_seconds)
-
 
     def reset_pin(self, pin, duration_low = 0.05, duration_high = 0.05):
         pin.low()
