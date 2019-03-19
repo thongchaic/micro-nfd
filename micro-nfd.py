@@ -5,10 +5,17 @@ import network
 import ubinascii
 import socket
 import random
+from machine import Pin
+
+#----- NDN -----
 from face import Face 
 from fib import Fib 
-from machine import Pin
-import mutils
+
+#----- LoRa -----
+from sx127x import SX127x
+from controller_esp32 import ESP32Controller
+import lora_utils
+
 
 p0      =   Pin(0, Pin.OUT)
 p22     =   Pin(22, Pin.OUT)
@@ -19,18 +26,21 @@ p22.off()
 
 wlan = network.WLAN(network.STA_IF)
 UUID = ubinascii.hexlify(machine.unique_id()).decode()
-EUI = mutils.mac2eui(UUID)
+EUI = lora_utils.mac2eui(UUID)
 fibs = Fib()
+
+controller = ESP32Controller()
+lora = controller.add_transceiver(SX127x(name = EUI),
+        pin_id_ss = ESP32Controller.PIN_ID_FOR_LORA_SS,
+        pin_id_RxDone = ESP32Controller.PIN_ID_FOR_LORA_DIO0)
 
 #fibs = Fib
 
 def init():
 
-    print("-----------------")
-    print('UUID: ',UUID)
-    print('EUI : ',EUI)
-    print("-----------------")
+   
 
+    print('------ init ap -----')
     ap = network.WLAN(network.AP_IF)
     ap.active(True)
     ap_ip_group = '4.'+str(random.randrange(4,254))+'.'+str(random.randrange(4,254))+'.1'
@@ -41,6 +51,12 @@ def init():
     print(ap.config('essid'))
     print(ap.config('channel'))
     print(ap.ifconfig())
+
+    print('----- lora info ------')
+    print('UUID: ',UUID)
+    print('EUI : ',EUI)
+    print("-----------------")
+
     p0.off()
 
 def create_face(ssid,wifi):
@@ -122,6 +138,9 @@ def init_nfd():
     fid = dgram_face.start_dgram_face('0.0.0.0')
     print("DGRAM_FID=",fid)
 
+
+    #lora_face = Face(255)
+
     #fibs = Fib("0.0.0.0")
 
 def to_producer(data, address,s):
@@ -168,6 +187,9 @@ if __name__ == '__main__':
     find_neighbors()
 
     init_nfd()
+
+    lora.println("Hello Lora")
+
 
     #do_connect()
     #nfd()
