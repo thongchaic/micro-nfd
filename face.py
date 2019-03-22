@@ -73,6 +73,9 @@ class Face:
         else:
             print('unsolicited interest/data')
 
+    def do_send(self,payload,address):
+        print("do_send")
+        
     def start_face(self):
         host = socket.getaddrinfo(self.address, 6363)[0][-1]
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)

@@ -16,7 +16,6 @@ from sx127x import SX127x
 from controller_esp32 import ESP32Controller
 import lora_utils
 
-
 p0      =   Pin(0, Pin.OUT)
 p22     =   Pin(22, Pin.OUT)
 GROUP_PASSWORD = 'micropythoN'
@@ -25,6 +24,8 @@ p0.off()
 p22.off()
 
 wlan = network.WLAN(network.STA_IF)
+wlan.active(True)
+
 UUID = ubinascii.hexlify(machine.unique_id()).decode()
 EUI = lora_utils.mac2eui(UUID)
 fibs = Fib()
@@ -43,7 +44,7 @@ def init():
     ap.active(True)
     ap_ip_group = '4.'+str(random.randrange(4,254))+'.'+str(random.randrange(4,254))+'.1'
     ap.ifconfig((ap_ip_group, '255.255.255.0', ap_ip_group, '8.8.8.8'))
-    mac = ubinascii.hexlify(ap.config('mac')).decode()
+    #mac = ubinascii.hexlify(ap.config('mac')).decode()
     APNAME =  "NDN_"+str(EUI)
     ap.config(essid=APNAME,password=GROUP_PASSWORD) #channel=16
     print(ap.config('essid'))
@@ -54,7 +55,6 @@ def init():
     print('UUID: ',UUID)
     print('EUI : ',EUI)
     print("-----------------")
-
     p0.off()
 
 def create_face(ssid,wifi):
@@ -67,6 +67,7 @@ def create_face(ssid,wifi):
 def find_neighbors():
     wlan.disconnect()
     nets = wlan.scan()
+
     selected_ssid = None
 
     for i,n in enumerate(nets):
@@ -83,6 +84,7 @@ def find_neighbors():
                 print("GOOD_DBM_FOUND:",selected_ssid)
                 break
         '''
+
     '''
     if selected_ssid is None:
         if len(nets) > 0:
@@ -138,7 +140,6 @@ def init_nfd():
 
 
     #lora_face = Face(255)
-
     #fibs = Fib("0.0.0.0")
 
 def to_producer(data, address,s):
@@ -186,7 +187,7 @@ if __name__ == '__main__':
 
     init_nfd()
 
-    lora.println("Hello Lora")
+    lora.println("192.168.6.145")
 
 
     #do_connect()
