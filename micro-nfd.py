@@ -30,10 +30,10 @@ UUID = ubinascii.hexlify(machine.unique_id()).decode()
 EUI = lora_utils.mac2eui(UUID)
 fibs = Fib()
 
-controller = ESP32Controller()
-lora = controller.add_transceiver(SX127x(name = EUI),
-        pin_id_ss = ESP32Controller.PIN_ID_FOR_LORA_SS,
-        pin_id_RxDone = ESP32Controller.PIN_ID_FOR_LORA_DIO0)
+# controller = ESP32Controller()
+# lora = controller.add_transceiver(SX127x(name = "LoRa"),
+#         pin_id_ss = ESP32Controller.PIN_ID_FOR_LORA_SS,
+#         pin_id_RxDone = ESP32Controller.PIN_ID_FOR_LORA_DIO0)
 
 #fibs = Fib
 
@@ -111,8 +111,8 @@ def do_connect(ssid=None):
         while not wlan.isconnected():
             print('Trying to connect PNHome2')
             #wlan.connect('CSOffice2')
-            #wlan.connect('PNHome2', 'st11ae58*')
-            wlan.connect(ssid)
+            wlan.connect('PNHome2', 'st11ae58*')
+            #wlan.connect(ssid)
             #wlan.connect('CACTUS4_2', 'cactus6444')
             time.sleep(2)
             pass
@@ -139,8 +139,9 @@ def init_nfd():
     print("DGRAM_FID=",fid)
 
 
-    #lora_face = Face(255)
-    #fibs = Fib("0.0.0.0")
+    lora_face = Face(255)
+    lfid = lora_face.start_LoRa_face()
+    print("LORA_FID=",lfid)
 
 def to_producer(data, address,s):
     raspi = socket.getaddrinfo('192.168.1.18', 6363)[0][-1]
@@ -187,7 +188,7 @@ if __name__ == '__main__':
 
     init_nfd()
 
-    lora.println("192.168.6.145")
+    # lora.println("Helloworld")
 
 
     #do_connect()

@@ -4,6 +4,12 @@ import socket
 import random
 import ndn
 
+#----- LoRa -----
+from sx127x import SX127x
+from controller_esp32 import ESP32Controller
+import lora_utils
+
+
 class Face:
 
     def __init__(self,mtu):
@@ -19,15 +25,18 @@ class Face:
 
     def start_dgram_face(self,address):
         self.address = address
-        _thread.start_new_thread(self.start_face,())
+        _thread.start_new_thread(self.receive_dgram,())
         print("#Face dgram_face started...")
         return self.fid
         
     def start_l2_face(self):
         print("-------TODO-------")
+        
 
     def start_LoRa_face(self):
-        print("-------TODO-------")
+        _thread.start_new_thread(self.receive_lora,())
+        print("#LoRa Face started...")
+        return self.fid
 
     def start_Sigfox_face(self):
         print("-------TODO-------")
@@ -73,10 +82,11 @@ class Face:
         else:
             print('unsolicited interest/data')
 
+
     def do_send(self,payload,address):
         print("do_send")
         
-    def start_face(self):
+    def receive_dgram(self):
         host = socket.getaddrinfo(self.address, 6363)[0][-1]
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         sock.bind(host)
@@ -89,5 +99,19 @@ class Face:
     def stop_face(self):
         print("#Face => stoping face!!!")
         self.stop = True
-        
+
+    def receive_lora(self):
+        controller = ESP32Controller()
+        lora = controller.add_transceiver(SX127x(name = "LoRa"),
+            pin_id_ss = ESP32Controller.PIN_ID_FOR_LORA_SS,
+            pin_id_RxDone = ESP32Controller.PIN_ID_FOR_LORA_DIO0)
+
+        while True:
+            if lora.receivedPacket():
+                try:
+                    payload = lora.read_payload()
+                    print("LoRa Payload=>",payload)
+                except Exception as e:
+                    print(e)
+
         
