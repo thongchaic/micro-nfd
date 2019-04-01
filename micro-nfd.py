@@ -10,6 +10,8 @@ from machine import Pin
 #----- NDN -----
 from face import Face 
 from fib import Fib 
+from face_table import FaceTable
+ft = FaceTable()
 
 #----- LoRa -----
 from sx127x import SX127x
@@ -123,10 +125,10 @@ def do_connect(ssid=None):
     print(wlan.ifconfig(), mac)
     p22.off()
 
-def on_Interest(interest):
+def on_Interest(interest,fid):
     print("Incoming Interest[MAIN]=>",interest)
 
-def on_Data(data):
+def on_Data(data,fid):
     print("Incoming Data[MAIN]=>",data)
 
 def init_nfd():
@@ -136,11 +138,14 @@ def init_nfd():
     dgram_face.on_Data = on_Data
     
     fid = dgram_face.start_dgram_face('0.0.0.0')
+    ft.add_face(fid,dgram_face)
+
     print("DGRAM_FID=",fid)
 
 
     lora_face = Face(255)
     lfid = lora_face.start_LoRa_face()
+    ft.add_face(lfid,lora_face)
     print("LORA_FID=",lfid)
 
 def to_producer(data, address,s):

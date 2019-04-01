@@ -52,7 +52,7 @@ class Face:
     def fragmentation(self):
         print("------TODO---------")
 
-    def do_send(self,payload,address):
+    def do_send(self,payload,face):
         print('....')
 
     def reassembly(self):
@@ -74,11 +74,11 @@ class Face:
             print("incoming Interest=>",payload)
             if self.on_Interest is not None:
                 #print('callback pl=>',payload[4::])
-                self.on_Interest(payload[5::])
+                self.on_Interest(self.fid,payload[5::])
         elif t == ndn.TLV_DATA:
             print("incoming Data=>",payload)
             if self.on_Data is not None:
-                self.on_Data(payload[4::])
+                self.on_Data(self.fid,payload[4::])
         else:
             print('unsolicited interest/data')
 
