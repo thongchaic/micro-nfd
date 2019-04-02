@@ -127,6 +127,8 @@ def do_connect(ssid=None):
 
 def on_Interest(interest,fid):
     print("Incoming Interest[MAIN]=>",interest)
+    
+
 
 def on_Data(data,fid):
     print("Incoming Data[MAIN]=>",data)

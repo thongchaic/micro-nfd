@@ -16,3 +16,7 @@ class FaceTable:
             if f[0] == fid:
                 return f[1]
         return None
+    
+    def face_timeout(self):
+        #----TODO-----
+        
