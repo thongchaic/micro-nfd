@@ -10,8 +10,8 @@ from machine import Pin
 #----- NDN -----
 from face import Face 
 from fib import Fib 
-from face_table import FaceTable
-ft = FaceTable()
+#from face_table import FaceTable
+#ft = FaceTable()
 
 #----- LoRa -----
 from sx127x import SX127x
@@ -140,14 +140,14 @@ def init_nfd():
     dgram_face.on_Data = on_Data
     
     fid = dgram_face.start_dgram_face('0.0.0.0')
-    ft.add_face(fid,dgram_face)
+    #ft.add_face(fid,dgram_face)
 
-    print("DGRAM_FID=",fid)
+    #print("DGRAM_FID=",fid)
 
 
     lora_face = Face(255)
     lfid = lora_face.start_LoRa_face()
-    ft.add_face(lfid,lora_face)
+    #ft.add_face(lfid,lora_face)
     print("LORA_FID=",lfid)
 
 def to_producer(data, address,s):
@@ -186,6 +186,22 @@ def nfd():
             print("interupted ... ")
             break
 
+
+def test_lora():
+    controller = ESP32Controller()
+    lora = controller.add_transceiver(SX127x(name = "LORA"),
+        pin_id_ss = ESP32Controller.PIN_ID_FOR_LORA_SS,
+        pin_id_RxDone = ESP32Controller.PIN_ID_FOR_LORA_DIO0)
+    print("Waiting for Payload")
+    while True:
+        if lora.receivedPacket():
+            try:
+                payload = lora.read_payload()
+                print("LoRa Payload=>",payload)
+            except Exception as e:
+                print(e)
+
+
 if __name__ == '__main__':
     p0.on()
     p22.on()
@@ -193,7 +209,10 @@ if __name__ == '__main__':
    
     find_neighbors()
 
-    init_nfd()
+    #init_nfd()
+
+
+    test_lora()
 
     # lora.println("Helloworld")
 
