@@ -112,6 +112,3 @@ class Face:
                     payload = lora.read_payload()
                     print("LoRa Payload=>",payload)
                 except Exception as e:
-                    print(e)
-
-        

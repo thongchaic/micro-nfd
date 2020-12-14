@@ -1,4 +1,3 @@
-
 import time 
 class FaceTable:
 

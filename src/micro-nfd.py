@@ -207,7 +207,7 @@ if __name__ == '__main__':
     p22.on()
     init()
    
-    find_neighbors()
+    #find_neighbors()
 
     #init_nfd()
 
