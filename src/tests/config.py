@@ -15,6 +15,20 @@
 
 """
 
+TTN_FREQS = {0: (0xe6, 0xCC, 0xF4), # 923.2 Mhz
+ 1: (0xe6, 0xD9, 0xC0), # 923.4 Mhz
+ 2: (0xe6, 0xe6, 0x66), # 923.6 Mhz
+ 3: (0xe6, 0xf3, 0x33), # 923.8 Mhz
+ 4: (0xe7, 0x00, 0x00), # 924.0 Mhz
+ 5: (0xe7, 0x0C, 0xCC), # 924.2 Mhz
+ 6: (0xe7, 0x19, 0x99), # 924.4 Mhz
+ 7: (0xe7, 0x26, 0x66)} # 924.6 Mhz
+
+lora._mod->setRegValue(SX1278_REG_FRF_MSB, 0x6C);
+lora._mod->setRegValue(SX1278_REG_FRF_MID, 0x80);
+lora._mod->setRegValue(SX1278_REG_FRF_LSB, 0x00);
+
+
 device_config = {
     'miso':19,
     'mosi':23,
