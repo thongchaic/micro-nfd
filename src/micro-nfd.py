@@ -66,6 +66,8 @@ def create_face(ssid,wifi):
     #print("Connecting to ",ssid,mac)
     wlan.connect(ssid,GROUP_PASSWORD)
 
+    
+
 def find_neighbors():
     wlan.disconnect()
     nets = wlan.scan()
