@@ -16,3 +16,4 @@ def get_nodename():
     uuid = ubinascii.hexlify(machine.unique_id()).decode()
     node_name = "ESP_" + uuid
     return node_name
+

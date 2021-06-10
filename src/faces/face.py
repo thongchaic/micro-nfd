@@ -5,33 +5,43 @@ import random
 import ndn
 
 #----- LoRa -----
+# from controller_esp32 import ESP32Controller
+# import lora_utils
+from config import *
 from sx127x import SX127x
-from controller_esp32 import ESP32Controller
-import lora_utils
-
+from machine import Pin, SPI, UART
+from Ndn import NDN 
 
 class Face:
 
-    def __init__(self,mtu):
+    def __init__(self,mtu=-1):
         print("#Face init")
-        self.on_Interest = None
-        self.on_Data = None 
+
+        self.ndn = NDN()
+
+        self.onRecieveInterest = None
+        self.onReceivedData = None 
         
         self.stop = False
         self.MTU = mtu
         self.fid = self.generate_face_id()
         self.fragments = [] # in a tuble (index,length,data)
         print("Face init [, MTU:",self.MTU,", FID:",self.fid)
+        
 
-    def start_dgram_face(self,address):
+    def get_fid(self):
+        f = random.randrange(1,1000)
+        print('#Face creating FID .. => ',f)
+        return f
+
+    def start_udp_face(self,address):
         self.address = address
-        _thread.start_new_thread(self.receive_dgram,())
+        _thread.start_new_thread(self.receive_udp,())
         print("#Face dgram_face started...")
         return self.fid
         
     def start_l2_face(self):
         print("-------TODO-------")
-        
 
     def start_LoRa_face(self):
         _thread.start_new_thread(self.receive_lora,())
@@ -44,10 +54,7 @@ class Face:
     def start_mqtt_face(self):
         print("-------TODO-------")
 
-    def generate_face_id(self):
-        f = random.randrange(1,1000)
-        print('#Face creating FID .. => ',f)
-        return f
+    
 
     def fragmentation(self):
         print("------TODO---------")
@@ -72,13 +79,13 @@ class Face:
         t,c,i,l = ndn.parse_tcilv(payload[0],payload[1],payload[2:4])
         if t == ndn.TLV_INTEREST:
             print("incoming Interest=>",payload)
-            if self.on_Interest is not None:
+            if self.onRecieveInterest is not None:
                 #print('callback pl=>',payload[4::])
-                self.on_Interest(self.fid,payload[5::])
+                self.onRecieveInterest(self.fid,payload[5::])
         elif t == ndn.TLV_DATA:
             print("incoming Data=>",payload)
-            if self.on_Data is not None:
-                self.on_Data(self.fid,payload[4::])
+            if self.onReceivedData is not None:
+                self.onReceivedData(self.fid,payload[4::])
         else:
             print('unsolicited interest/data')
 
@@ -86,29 +93,11 @@ class Face:
     def do_send(self,payload,address):
         print("do_send")
         
-    def receive_dgram(self):
-        host = socket.getaddrinfo(self.address, 6363)[0][-1]
-        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        sock.bind(host)
-        print("#Face dgram ",self.address," started!!!")
-        while not self.stop:
-            payload, addr = sock.recvfrom(8800)
-            self.do_receive(payload,addr)
-        print("#Face stoped!!")
-
+  
     def stop_face(self):
         print("#Face => stoping face!!!")
         self.stop = True
 
-    def receive_lora(self):
-        controller = ESP32Controller()
-        lora = controller.add_transceiver(SX127x(name = "LoRa"),
-            pin_id_ss = ESP32Controller.PIN_ID_FOR_LORA_SS,
-            pin_id_RxDone = ESP32Controller.PIN_ID_FOR_LORA_DIO0)
-
-        while True:
-            if lora.receivedPacket():
-                try:
-                    payload = lora.read_payload()
-                    print("LoRa Payload=>",payload)
-                except Exception as e:
+    def send_lora(self):
+        pass 
+        

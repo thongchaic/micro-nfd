@@ -14,7 +14,6 @@
 #
 
 """
-
 TTN_FREQS = {0: (0xe6, 0xCC, 0xF4), # 923.2 Mhz
  1: (0xe6, 0xD9, 0xC0), # 923.4 Mhz
  2: (0xe6, 0xe6, 0x66), # 923.6 Mhz
@@ -27,7 +26,6 @@ TTN_FREQS = {0: (0xe6, 0xCC, 0xF4), # 923.2 Mhz
 lora._mod->setRegValue(SX1278_REG_FRF_MSB, 0x6C);
 lora._mod->setRegValue(SX1278_REG_FRF_MID, 0x80);
 lora._mod->setRegValue(SX1278_REG_FRF_LSB, 0x00);
-
 
 device_config = {
     'miso':19,
@@ -91,7 +89,6 @@ appKey = "81EFF308C0E6111761FC71D963B06522"
 #define DIO0_GPIO       26
 #define DIO1_GPIO       33
 #define DIO2_GPIO       32
-
 
 device_config = {
     'miso':19,
