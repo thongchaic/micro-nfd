@@ -1,9 +1,9 @@
-#      __
+#      ^^
 #     (oo)
-#    _(__)_
-#  ---------------
-#  < MicroNFD >
-#  ---------------      
+#    /(__)\
+#  -------------
+#  < MicroNFD∞ >
+#  -------------      
 from fw import Forwarder
 from wifi-manger import WifiManager
 from config import * 
@@ -19,10 +19,13 @@ class MicroNFD(object):
         self.manager = WifiManager(wifi_config)
         self.manager.connect()
         self.fwd = Forwarder(self.UUID,self.config)
+        #The huanting of MicroNFD's daemon 
+        self.nfd.daemon()
 
 class Simulator(object):
-    
-    def __init__(self):
+    # 0 Gw
+    # 1 Sensor 
+    def __init__(self,role=0):
 
         self.manager = WifiManager(wifi_config)
         self.manager.connect()
@@ -56,7 +59,11 @@ class Simulator(object):
         
     def deReceive(self,data):
         self.r = self.r+1
+    
+    def start(self):
+        pass 
 
 
 if __name__ == '__main__':
-    micro_nfd = MicroNFD()
+    sim = Simulator()
+    sim.start(0)
