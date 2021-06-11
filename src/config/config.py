@@ -90,6 +90,7 @@ appKey = "81EFF308C0E6111761FC71D963B06522"
 #define DIO1_GPIO       33
 #define DIO2_GPIO       32
 
+
 device_config = {
     'miso':19,
     'mosi':27,
