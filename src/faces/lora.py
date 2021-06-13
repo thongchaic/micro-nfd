@@ -28,11 +28,12 @@ class LoRa(object):
     def face_id(self):
         return self.fid 
 
-    def send(self,pkt):
-        if len(pkt)<4:
+    def send(self,payload):
+        if len(payload)<4:
             return
-        self.lora.println(pkt, implicit_header=False)
-        pass
+        
+        self.lora.println(payload, implicit_header=False)
+        
 
     def receive(self,payload=None):
         if payload is None and len(payload) > 5:

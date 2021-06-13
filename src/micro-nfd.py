@@ -2,10 +2,19 @@
 #     (oo)
 #    /(__)\
 #  -------------
-#  < MicroNFD∞ >
-#  -------------      
+#  < MicroNFD >
+#  -------------     
+
+#Simulator only 
+import sys 
+sys.path.insert(0, 'fw')
+sys.path.insert(0, 'config')
+sys.path.insert(0, 'utils')
+sys.path.insert(0, 'faces')
+
+
 from fw import Forwarder
-from wifi-manger import WifiManager
+from wifi_manger import WifiManager
 from config import * 
 import time 
 import urandom 
@@ -19,14 +28,15 @@ class MicroNFD(object):
         self.manager = WifiManager(wifi_config)
         self.manager.connect()
         self.fwd = Forwarder(self.UUID,self.config)
-        #The huanting of MicroNFD's daemon 
+
+        #The haunting of MicroNFD's daemon 
         self.nfd.daemon()
 
 class Simulator(object):
     # 0 Gw
-    # 1 Sensor 
+    # 1 Sensor
     def __init__(self,role=0):
-
+                 
         self.manager = WifiManager(wifi_config)
         self.manager.connect()
         self.fwd = Forwarder(self.UUID,self.config)
@@ -35,7 +45,10 @@ class Simulator(object):
         self.r = 0
         self.owner = 10
         self.nonce = urandom.random()
-    
+
+    def nfdc(self):
+        pass 
+
     def joinInterst(self):
         #NDN-LPWAN JoinInterest Procedure 
         self.fwd.send('/alice/join',self.nonce)

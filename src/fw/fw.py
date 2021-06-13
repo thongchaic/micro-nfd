@@ -1,9 +1,9 @@
-from utils.cs import CS
+#from utils.cs import CS
 import os 
 import time
-import machine
-import network
-import ubinascii
+#import machine
+#import network
+#import ubinascii
 import socket
 import random
 #----- NDN -----
@@ -32,10 +32,29 @@ class Forwarder(object):
         self.lora.onReceivedData = onReceivedData
         self.table.add(self.lora.fid, self.lora)
 
-    def onRecievedInterest(self,fid,t, c, i, l,interest):
-        print(fid,t, c, i, l,interest)
-        #strategy & forward 
+    def onRecievedInterest(self,fid,t, c, i, l,name,interest):
+        print(fid,t, c, i, l,name,interest)
+
+        if name is None: #Unsolicited 
+            return
         
+        #no-cs 
+
+        if not self.routes.match(name):
+            #Nack reason: routes not found
+            self.nack(fid, name)
+            return 
+        
+        #get multipath routes  
+        fids = self.routes.get(name)
+
+        face = self.table.get(fids[0])
+
+        face.send(name,"data")
+
+
+
+
     def onReceivedData(self,fid,t, c, i, l, data):
         print(fid,t, c, i, l, data)
 

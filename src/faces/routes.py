@@ -4,9 +4,15 @@ class Routes(object):
         self.routes={}
         pass
     def add(self,fid,name):
-        pass
+        if name in self.routes:
+            self.routes[namme].push(fid)
+        else:
+            self.routes[namme] = [fid]
     def remove(self,name):
         pass
-    def match(self,name):
-        #find
+    def get(self,name):
         return self.routes[name]
+    def match(self,name):
+        if self.routes[name]:
+            return True
+        return False 

@@ -16,7 +16,8 @@ class UDP(object):
 
     def send(self,payload):
         #Pket construction 
-        pass 
+        print("UDP=>", payload)
+        
     
     def receive(selfj,addr=None,payload=None):
 
@@ -26,7 +27,7 @@ class UDP(object):
         t,c,i,l = self.ndn.parse(payload)
 
         if t is None or c is None or i is None or l is None:
-            return 
+            return
         
         if (Interest.TLV_INTEREST & t) == Interest.TLV_INTEREST:
             if self.onReceivedInterst is None:
