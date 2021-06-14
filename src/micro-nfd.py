@@ -27,7 +27,7 @@ class MicroNFD(object):
         #read config 
         self.manager = WifiManager(wifi_config)
         self.manager.connect()
-        self.fwd = Forwarder(self.UUID,self.config)
+        self.fwd = Forwarder(self.UUID,device_config)
 
         #The haunting of MicroNFD's daemon 
         self.nfd.daemon()
@@ -55,7 +55,8 @@ class Simulator(object):
 
          
     def joinAccepted(self, data):
-        self.fwd.send("/alice/KEY","sig/")
+        print('Accepted ')
+        pass 
 
     def joinRejected(self):
         pass
@@ -69,7 +70,7 @@ class Simulator(object):
             else:
                 self.fwd.send("/alice/room/living/light","off")
             time.sleep(3)
-        
+    
     def deReceive(self,data):
         self.r = self.r+1
     

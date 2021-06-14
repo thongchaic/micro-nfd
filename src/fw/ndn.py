@@ -5,8 +5,8 @@ import random
 class Ndn:
     def __init__(self):
         print("ndn init")
-
-   def get_fid(self):
+    
+    def gen_fid(self):
         f = random.randrange(1,1000)
         print('#Face creating FID .. => ',f)
         return f

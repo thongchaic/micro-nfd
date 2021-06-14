@@ -8,21 +8,23 @@ from ndn import Ndn
 #ESP32 TTGOv1 
 
 class LoRa(object):
-    def __init__(self):
+    def __init__(self, device_config):
         self.ndn = Ndn()
         self.onReceivedInterst = None
         self.onReceivedData = None
-        device_config['mosi'], Pin.OUT, Pin.PULL_UP,
-        device_config['miso'], Pin.IN, Pin.PULL_UP)
+        self.onReceivedJoinInterest = None 
+        self.onReceivedJoinData = None 
+
         device_spi = SPI(baudrate = 10000000, 
             polarity = 0, phase = 0, bits = 8, firstbit = SPI.MSB,
             sck = Pin(device_config['sck'], Pin.OUT, Pin.PULL_DOWN),
             mosi = Pin(device_config['mosi'], Pin.OUT, Pin.PULL_UP),
             miso = Pin(device_config['miso'], Pin.IN, Pin.PULL_UP)
         )
+
         self.lora = SX127x(device_spi, pins=device_config, parameters=lora_parameters)
-        self.fid = self.ndn.get_fid()
-        #Haunted by a Daemon
+        self.fid = self.ndn.gen_fid()
+        #Haunted by the MicroNFD's daemon
         _thread.start_new_thread(self.daemon,())
 
     def face_id(self):
@@ -31,12 +33,10 @@ class LoRa(object):
     def send(self,payload):
         if len(payload)<4:
             return
-        
         self.lora.println(payload, implicit_header=False)
         
-
     def receive(self,payload=None):
-        if payload is None and len(payload) > 5:
+        if payload is None and len(payload) < 5:
             return
         
         t,c,i,l = self.ndn.parse(payload)
@@ -55,12 +55,17 @@ class LoRa(object):
         elif (Data.TLV_DATA & t) == Data.TLV_DATA:
             if self.onReceivedData:
                 self.onReceivedData(self.fid, t,c,i,l ,payload)
+        elif (Interest.TLV_JOIN_INTEREST & t) == Interest.TLV_JOIN_INTEREST:
+            if self.onReceivedJoinInterest:
+                self.onReceivedJoinInterest(self.fid, t,c,i,l ,payload)
+        elif (Interest.TLV_JOIN_DATA & t) == Data.TLV_JOIN_DATA:
+            if self.onReceivedJoinData:
+                self.onReceivedJoinData(self.fid, t,c,i,l ,payload)
         
     def daemon(self):
         while not self.stop:
             if self.lora.received_packet():
                 payload = self.lora.read_payload()
                 self.receive(payload)
-        print("LoRa face terminated..!")
     
     
