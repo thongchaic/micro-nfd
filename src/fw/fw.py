@@ -35,37 +35,32 @@ class Forwarder(object):
         self.lora.onReceivedJoinData = onReceivedJoinData
         self.table.add(self.lora.fid, self.lora)
 
-    def onRecievedInterest(self,fid,t, c, i, l,interest):
-        print(fid,t, c, i, l,interest)
+    def onRecievedInterest(self,in_face,t, c, i, l,interest):
+        print(in_face,t, c, i, l,interest)
 
         #extract name 
-        name = interest[0:32]
+        name = interest[32:64]
 
         if name is None: #Unsolicited 
             return
         
-        #no-cs 
-        
-        #PIT 
-         if not self.routes.pit(name):
-            #do noting 
+        #no cs implemented
+
+
+        #pit 
+        if self.routes.pit(name):
+            #Already in Pit  
             return
-        #FWD 
+        
+        #fwd interest 
         if not self.routes.match(name):
             #Nack reason: routes not found
-            self.nack(fid, name)
+            self.nack(in_face, name,'no routes')
             return
-        
-        
-        #Join Interest s
-        
-        #Get multipath routes  
-        # fids = self.routes.get(name)
-        # face = self.table.get(fids[0])
-        # #Forward
-        # face.send(name,"data")
 
-        self.sendData(name,data)
+        #fw interest
+        self.sendInterest(name,interest)
+        
 
     def onReceivedData(self,fid,t, c, i, l, data):
         print(fid,t, c, i, l, data)
@@ -74,29 +69,39 @@ class Forwarder(object):
         if name is None:
             return
 
-    def onReceivedJoinInterest(self,fid,t,c,i,l,name,interest):
+    def onReceivedJoinInterest(self,in_face,t, c, i, l,interest):
         #checking for registered devices
-        fids = self.routes.get(name)
-        face = self.table.get(fids[0])
-        face.send("/data","accepted!")
+        # fids = self.routes.get(name)
+        # if len(fids) > 0:
+        #     face = self.table.get(fids[0])
+        #     face.send("/data","accepted!")
+        accepted = True 
+        name = interest[32:64]
+        if name is None: #Unsolicited 
+            return
+
+        if accepted:
+           self.sendData(in_face,name,"accepted")
+        else:
+            self.nack(in_face,name,"rejected")
 
     def onReceivedJoinData(self,fid,t,c,i,l,name,data):
         #store EKEY 
         self.EKEY=data
 
-    def sendInterest(self,name,data):
-        _fid = self.table.match(name)
-        if _fid is None:
-            self.nack(name)
-
-    def sendData(self,name,data):
-
+    def sendInterest(self,fid, name,interest):
         fids = self.routes.get(name)
-        face = self.table.get(fids[0])
-        face.send(name,"data") 
+        if len(fids) > 0:
+            out_face = self.table.get(fids[0])
+            out_face.send(name,interest)
+            face.send(name,interest)
+
+    def sendData(self,out_face, name,data):
+        #EKEY
+        out_face.send(name,data) 
         
-    def nack(self,name):
-        pass 
+    def nack(self,out_face, name, reason):
+        out_face.send(name,reason)
         
     def onReceivedNack(self):
         pass

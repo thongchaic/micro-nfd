@@ -1,8 +1,15 @@
-import Data 
-import Interest
+# import Data 
+# import Interest
 import random 
 
 class Ndn:
+    INTEREST = 4
+    DATA = 5
+    NACK = 6 
+    JOIN_INTEREST = 7
+    JOIN_ACCETED = 8
+    JOIN_REJECTED = 9 
+
     def __init__(self):
         print("ndn init")
     
@@ -10,7 +17,7 @@ class Ndn:
         f = random.randrange(1,1000)
         print('#Face creating FID .. => ',f)
         return f
-
+     
     def parse(payload=None):
         
         '''
@@ -33,10 +40,10 @@ class Ndn:
         payload_len = 0
         chksum2=chksum1 #To be calculated
 
-        if (Interest.TLV_INTEREST & t) == Interest.TLV_INTEREST:
-            pkt_type = Interest.TLV_INTEREST
-        elif (Data.TLV_DATA & t) == Data.TLV_DATA: 
-            pkt_type = Data.TLV_DATA
+        if (INTEREST & t) == INTEREST:
+            pkt_type = INTEREST
+        elif (DATA & t) == DATA: 
+            pkt_type = DATA
         
         frag_count = c & 0x0F
         frag_index = c & 0xF0
@@ -49,5 +56,34 @@ class Ndn:
         #print("-FragInfo=>",pkt_type,frag_count,frag_index,len(l),l,payload_len,bin(payload_len))
         return pkt_type, frag_count, frag_index, payload_len, reserved, chksum, (chksum1 == chksum2)
     
-    def cheksum(self,data):
+    def chksum(self,data):
         return 0xFFFF
+
+    def encode(self,_type,name,payload):
+        #Header + Payload 
+        '''
+            | parse 32 bits header 
+            | t = 8-bit Types 
+            | c = 4-bit Fragment Count 
+            | i = 4-bit Fragment Index
+            | l = 16-bit Length     
+            | lat (optional)
+            | lng (optional)
+        '''
+        chksum = self.chksum(payload)
+        #It does not perform fragmentation 
+        f_count = 1 #Single Fragment
+        f_index = 0 #Index of the Fragment 
+        f_count = f_count << 4 
+        opt = f_count | f_index 
+        p_len = len(payload)
+        n_len = len(name)
+
+        encoded =   bytes(_type)+ \
+                    bytes(opt)+ \
+                    bytes(p_len)+ \
+                    bytes(n_len)+ \
+                    bytes(name)+ \
+                    bytes(payload)
+
+        return encoded
