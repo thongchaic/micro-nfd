@@ -72,6 +72,7 @@ class Ndn:
         '''
         chksum = self.chksum(payload)
         #It does not perform fragmentation 
+
         f_count = 1 #Single Fragment
         f_index = 0 #Index of the Fragment 
         f_count = f_count << 4 
