@@ -6,7 +6,7 @@ class FaceTable:
         self.faces = []
         
     def add(self,fid,face):
-        self.faces.append({ fid:( face, time.tick_ms()) })
+        self.faces.append({ fid:( face, time.time()) })
     
     def remove(self,fid):
         #for f in self.faces:
@@ -21,5 +21,6 @@ class FaceTable:
         return self.faces[fid]
     
     def face_timeout(self):
+        pass 
         #----TODO-----
 

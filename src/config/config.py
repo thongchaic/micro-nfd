@@ -120,8 +120,8 @@ lora_parameters = {
 }
 
 wifi_config = {
-    'ssid':'CSOffice2',
-    'password':''
+    'ssid':'PNHome2',
+    'password':'st11ae58*'
 }
 
 

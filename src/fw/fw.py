@@ -11,7 +11,7 @@ import random
 # from fib import Fib 
 # from face_table import FaceTable
 from udp import UDP
-from lora import LoRa
+# from lora import LoRa
 from face_table import FaceTable
 from routes import Routes
 
@@ -23,17 +23,17 @@ class Forwarder(object):
         self.routes = Routes()
         self.EKEY = None
 
-        self.udp = UDP(1500)
-        self.udp.onRecievedInterest = onRecieveInterest
-        self.udp.onReceivedData = onReceivedData
+        self.udp = UDP()
+        self.udp.onRecievedInterest = self.onRecievedInterest
+        self.udp.onReceivedData = self.onReceivedData
         self.table.add(self.udp.fid, self.udp)
 
-        self.lora = LoRa(device_config)
-        self.lora.onRecieveInterest = onRecieveInterest
-        self.lora.onReceivedData = onReceivedData
-        self.lora.onReceivedJoinInterest = onReceivedJoinInterest
-        self.lora.onReceivedJoinData = onReceivedJoinData
-        self.table.add(self.lora.fid, self.lora)
+        # self.lora = LoRa(device_config)
+        # self.lora.onRecieveInterest = onRecieveInterest
+        # self.lora.onReceivedData = onReceivedData
+        # self.lora.onReceivedJoinInterest = onReceivedJoinInterest
+        # self.lora.onReceivedJoinData = onReceivedJoinData
+        # self.table.add(self.lora.fid, self.lora)
 
     def onRecievedInterest(self,in_face,t, c, i, l,interest):
         print(in_face,t, c, i, l,interest)
@@ -61,7 +61,6 @@ class Forwarder(object):
         #fw interest
         self.sendInterest(name,interest)
         
-
     def onReceivedData(self,fid,t, c, i, l, data):
         print(fid,t, c, i, l, data)
 
@@ -69,7 +68,7 @@ class Forwarder(object):
         if name is None:
             return
 
-    def onReceivedJoinInterest(self,in_face,t, c, i, l,interest):
+    def onReceivedJoinInterest(self,in_face,pkt_type, f_count, f_index, p_len, n_len, chksum, name, payload):
         #checking for registered devices
         # fids = self.routes.get(name)
         # if len(fids) > 0:
@@ -85,7 +84,7 @@ class Forwarder(object):
         else:
             self.nack(in_face,name,"rejected")
 
-    def onReceivedJoinData(self,fid,t,c,i,l,name,data):
+    def onReceivedJoinData(self,fid,pkt_type, f_count, f_index, p_len, n_len, chksum, name, payload):
         #store EKEY 
         self.EKEY=data
 

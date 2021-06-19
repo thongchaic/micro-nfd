@@ -12,22 +12,22 @@ sys.path.insert(0, 'config')
 sys.path.insert(0, 'utils')
 sys.path.insert(0, 'faces')
 
-
 from fw import Forwarder
-from wifi_manger import WifiManager
+from wifi_manager import WifiManager
 from config import * 
 import time 
-import urandom 
+# import urandom 
+#import ubinascii
 
-UUID = ubinascii.hexlify(machine.unique_id()).decode()
+UUID = 'simulator' #ubinascii.hexlify( machine.unique_id() ).decode()
 #EUI = lora_utils.mac2eui(UUID)
 
 class MicroNFD(object):
     def __init__(self,config="config.py"):
         #read config 
-        self.manager = WifiManager(wifi_config)
-        self.manager.connect()
-        self.fwd = Forwarder(self.UUID,device_config)
+        # self.manager = WifiManager(wifi_config)
+        # self.manager.connect()
+        # self.fwd = Forwarder(self.UUID,device_config)
 
         #The haunting of MicroNFD's daemon 
         self.nfd.daemon()
@@ -38,13 +38,13 @@ class Simulator(object):
     def __init__(self,role=0):
                  
         self.manager = WifiManager(wifi_config)
-        self.manager.connect()
-        self.fwd = Forwarder(self.UUID,self.config)
+        #self.manager.connect()
+        self.fwd = Forwarder("simulator",device_config)
 
         self.n = 10
         self.r = 0
         self.owner = 10
-        self.nonce = urandom.random()
+        self.nonce = 'nonce'#urandom.random()
 
     def nfdc(self):
         pass 
@@ -53,7 +53,6 @@ class Simulator(object):
         #NDN-LPWAN JoinInterest Procedure 
         self.fwd.send('/alice/join',self.nonce)
 
-         
     def joinAccepted(self, data):
         print('Accepted ')
         pass 
@@ -77,7 +76,6 @@ class Simulator(object):
     def start(self):
         pass 
 
-
 if __name__ == '__main__':
     sim = Simulator()
-    sim.start(0)
+    sim.start()

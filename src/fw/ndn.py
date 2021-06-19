@@ -1,6 +1,6 @@
-# import Data 
-# import Interest
 import random 
+import binascii
+
 
 class Ndn:
     INTEREST = 4
@@ -10,16 +10,15 @@ class Ndn:
     JOIN_ACCETED = 8
     JOIN_REJECTED = 9 
 
+
     def __init__(self):
         print("ndn init")
     
-    def gen_fid(self):
+    def fid(self):
         f = random.randrange(1,1000)
-        print('#Face creating FID .. => ',f)
         return f
      
-    def parse(payload=None):
-        
+    def decode(self, raw="0410ffff05062f68656c6c6f776f726c64"):
         '''
             | parse 32 bits header 
             | t = 8-bit Types 
@@ -29,35 +28,37 @@ class Ndn:
             | lat (optional)
             | lng (optional)
         '''
-
-        if payload is None or len(payload) <= 4:
+        if raw is None or len(raw) <= 14:
             return None, None, None, None 
-        
-        t, c, l, chksum1, reserved = payload[0],payload[1],payload[2:4], payload[4:6], payload[6:8]
-        pkt_type = 0 
-        frag_count = 0 
-        frag_index = 0
-        payload_len = 0
-        chksum2=chksum1 #To be calculated
+     
+        pkt_type = int(raw[0:2],16)
+        # pkt_type = 0
 
-        if (INTEREST & t) == INTEREST:
-            pkt_type = INTEREST
-        elif (DATA & t) == DATA: 
-            pkt_type = DATA
-        
-        frag_count = c & 0x0F
-        frag_index = c & 0xF0
-        frag_index >>= 4
+        # if (Ndn.INTEREST & t) == Ndn.INTEREST:
+        #     pkt_type = Ndn.INTEREST
+        # elif (Ndn.DATA & t) == Ndn.DATA: 
+        #     pkt_type = Ndn.DATA
 
-        payload_len = l[0]
-        payload_len <<= 8
-        payload_len = payload_len | l[1]
-         
+        frag = int(raw[2:4],16)
+        f_count = frag & 0xF0
+        f_count >>= 4 
+        f_index = frag & 0x0F
+
+        chksum = int(raw[4:8],16)
+        n_len = 2+int(raw[8:10],16)*2
+        p_len = 2+int(raw[10:12],16)*2
+
+        name = binascii.unhexlify( raw[ 12:(12+n_len) ])
+        payload = binascii.unhexlify( raw[(12+n_len):])
+        
         #print("-FragInfo=>",pkt_type,frag_count,frag_index,len(l),l,payload_len,bin(payload_len))
-        return pkt_type, frag_count, frag_index, payload_len, reserved, chksum, (chksum1 == chksum2)
+        return pkt_type, f_count, f_index, p_len, n_len, chksum, name, payload
     
     def chksum(self,data):
-        return 0xFFFF
+        x = 0xFF
+        y = 0xFF
+        chksum = binascii.hexlify( chr(x)+chr(y) )
+        return chksum
 
     def encode(self,_type,name,payload):
         #Header + Payload 
@@ -70,21 +71,21 @@ class Ndn:
             | lat (optional)
             | lng (optional)
         '''
+        #no fragmentation & reassembly 
         chksum = self.chksum(payload)
-        #It does not perform fragmentation 
-
         f_count = 1 #Single Fragment
         f_index = 0 #Index of the Fragment 
         f_count = f_count << 4 
         opt = f_count | f_index 
         p_len = len(payload)
         n_len = len(name)
-
-        encoded =   bytes(_type)+ \
-                    bytes(opt)+ \
-                    bytes(p_len)+ \
-                    bytes(n_len)+ \
-                    bytes(name)+ \
-                    bytes(payload)
+        
+        encoded = binascii.hexlify(chr(_type))+\
+                binascii.hexlify(chr(opt))+\
+                chksum+\
+                binascii.hexlify(chr(p_len))+\
+                binascii.hexlify(chr(n_len))+\
+                binascii.hexlify( name )+\
+                binascii.hexlify( payload )
 
         return encoded
