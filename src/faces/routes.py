@@ -22,7 +22,7 @@ class Routes(object):
             return self.routes[name]
         return None 
 
-    def match(self, fid, name):
+    def match(self, name):
         if name not in self.routes:
             return False
         return True
@@ -34,7 +34,6 @@ class Routes(object):
 
         if fid not in self.routes[name]:
             self.routes[name].append(fid)
-            return True  
 
         return True
     

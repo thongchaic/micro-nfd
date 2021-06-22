@@ -10,7 +10,7 @@ class LoRa(object):
     def __init__(self, fid, device_config, lora_parameters):
 
         self.ndn = Ndn()
-        self.onReceivedInterst = None
+        self.onRecievedInterest = None
         self.onReceivedData = None
         self.onReceivedJoinInterest = None 
         self.onReceivedJoinData = None 
@@ -23,14 +23,14 @@ class LoRa(object):
 
         i=5
         while i > 0:
-            print(i,'.',end='')
+            print(i,'.',end=' ')
             time.sleep(1)
             i = i-1
 
         self.lora = SX127x(device_spi, pins=device_config, parameters=lora_parameters)
         self.fid = fid
         self.stop = False 
-
+        time.sleep(1)
         _thread.start_new_thread(self.daemon,())
 
     def face_id(self):
@@ -39,10 +39,13 @@ class LoRa(object):
     def terminate(self):
         self.stop = True 
 
-    def send(self,payload):
+    def send(self,_type, name, payload):
         if len(payload)<14:
             return
-        self.lora.println(payload, implicit_header=False)
+
+        hexlify = self.ndn.encode(_type,name,payload)
+        
+        self.lora.println(hexlify, implicit_header=False)
         
     def receive(self,payload=None):
         if payload is None or len(payload) < 14:
@@ -58,11 +61,11 @@ class LoRa(object):
             #--reassembly process
             return 
 
-        print("decoded=>",pkt_type, f_count, f_index, p_len, n_len, chksum, name, payload)
+        #print("decoded=>",pkt_type, f_count, f_index, p_len, n_len, chksum, name, payload)
 
         if pkt_type  == Ndn.INTEREST:
-            if self.onReceivedInterst:
-                self.onReceivedInterst(self.fid,f_count, f_index, p_len, n_len, chksum, name, payload)
+            if self.onRecievedInterest:
+                self.onRecievedInterest(self.fid,f_count, f_index, p_len, n_len, chksum, name, payload)
         elif pkt_type == Ndn.DATA:
             if self.onReceivedData:
                 self.onReceivedData(self.fid,f_count, f_index, p_len, n_len, chksum, name, payload)
