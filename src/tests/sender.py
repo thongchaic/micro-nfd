@@ -5,9 +5,6 @@ import urandom
 from config import *
 from machine import Pin, SPI, UART
 from sx127x import SX127x
-from Ndn import NDN 
-from Data import Data
-from Interest import Interest
 esp.osdebug(None)
 gc.enable()
 # MAC=c44f336ab725
@@ -28,8 +25,8 @@ gc.enable()
 #define LORA_DIO1       33
 #define LORA_BUSY       32
 
-class Sender(object):
-    def __init__(self,_id):
+class SRRULoRa(object):
+    def __init__(self,_id,ssid,ssid_pass):
         
         print("init....",device_config)
         print(lora_parameters)
@@ -47,18 +44,18 @@ class Sender(object):
         print(device_config)
         print(lora_parameters)
 
-        device_spi = SPI(
-            baudrate = 10000000,
-            polarity = 0, phase = 0, bits = 8, firstbit = SPI.MSB,
-            sck = Pin(device_config['sck'], Pin.OUT, Pin.PULL_DOWN),
-            mosi = Pin(device_config['mosi'], Pin.OUT, Pin.PULL_UP),
-            miso = Pin(device_config['miso'], Pin.IN, Pin.PULL_UP)
-        )
+        device_spi = SPI(baudrate = 10000000, 
+        polarity = 0, phase = 0, bits = 8, firstbit = SPI.MSB,
+        sck = Pin(device_config['sck'], Pin.OUT, Pin.PULL_DOWN),
+        mosi = Pin(device_config['mosi'], Pin.OUT, Pin.PULL_UP),
+        miso = Pin(device_config['miso'], Pin.IN, Pin.PULL_UP))
+        
+        print("AppEui=>",appEui)
+        print("AppKey=>",appKey)
         
         self.lora = SX127x(device_spi, pins=device_config, parameters=lora_parameters)
-        self.ndn = NDN(debug=True)
 
-    def do_connect(self,ssid,ssid_pass):
+    def do_connect(self):
         import network
         wlan=network.WLAN(network.STA_IF)
         wlan.active(True)
@@ -82,41 +79,49 @@ class Sender(object):
         
     def read_gps(self):
         gps = self.gps.read() 
-        print(gps)
+
+
+
         return gps if gps else None
 
-    def LoRa(self,interval=5,n=10):
+    def infinity_life(self):
         import machine
+
         c = 0
 
-        
+        self.do_connect()
+        gps = self.read_gps()
+        print(gps)
+        print('-----------')
+        #self.lora.println("hello")
 
-        while n>0:
-            
-            #generate NDN Interest 
-            ngn_pkt = "self.ndn."
+        while True:
+        #    #self.do_connect()
 
-            self.lora.println(ngn_pkt, implicit_header=False) #implicit_header=True = No data transmited 
-            #    if self.lora.received_packet():
-            #        payload = self.lora.read_payload()
-            #        print("payload=>",payload)
-            #
-            #    print('.')
-                
-            #    print(".",end="")
-            #    #if gc.mem_free() < 60000:
-            #    #    machine.reset()
-            #    #else:
-            #    #    print("collect..")
-            #    #    gc.collect()
-            self.lora.dump_registers()
-            time.sleep(interval)
-            n = n-1
+        #   #gps = self.read_gps()
+        #    #print("---->",gc.mem_free(),"<----")
+        #    #print(gps)
+        #
+            payload = "0410ffff06052f68656c6c6f776f726c64"
+            print("Sending=>",payload)
+            self.lora.println(payload, implicit_header=False) #implicit_header=True = No data transmited 
+        #    if self.lora.received_packet():
+        #        payload = self.lora.read_payload()
+        #        print("payload=>",payload)
+            #self.lora.dump_registers()
+            c = c + 1
+        #    print('.')
+            time.sleep(5)
+        #    print(".",end="")
+        #    #if gc.mem_free() < 60000:
+        #    #    machine.reset()
+        #    #else:
+        #    #    print("collect..")
+        #    #    gc.collect()
 
 if __name__ == '__main__':
     #str(urandom.getrandbits(30))
-    iot = Sender("")
-    iot.WiFi("PNHome2","st11ae58*")
-    iot.LoRa()
+    iot = SRRULoRa("","PNHome2","st11ae58*")
+    iot.infinity_life()
     print("---")
 
