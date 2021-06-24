@@ -236,6 +236,7 @@ class SX127x:
 
         if isinstance(msg, str):
             message = msg.encode()
+            #print("decoded: ",msg," => ",message)
  
         self.write(message)
 

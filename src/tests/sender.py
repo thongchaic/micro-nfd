@@ -6,6 +6,7 @@ from config import *
 from machine import Pin, SPI, UART
 from sx127x import SX127x
 esp.osdebug(None)
+import gc 
 gc.enable()
 # MAC=c44f336ab725
 # EUI=c64f33fffe6ab725
@@ -25,7 +26,7 @@ gc.enable()
 #define LORA_DIO1       33
 #define LORA_BUSY       32
 
-class SRRULoRa(object):
+class SRRULoRa:
     def __init__(self,_id,ssid,ssid_pass):
         
         print("init....",device_config)
@@ -36,13 +37,13 @@ class SRRULoRa(object):
         self.gps = UART(1)
         self.gps.init(9600,bits=8,parity=None,stop=1,tx=12,rx=34)
 
-        print("SPI==>")
-        print(0,0,8,SPI.MSB,device_config['sck'], Pin.OUT, Pin.PULL_DOWN,
-        device_config['mosi'], Pin.OUT, Pin.PULL_UP,
-        device_config['miso'], Pin.IN, Pin.PULL_UP)
+        # print("SPI==>")
+        # print(0,0,8,SPI.MSB,device_config['sck'], Pin.OUT, Pin.PULL_DOWN,
+        # device_config['mosi'], Pin.OUT, Pin.PULL_UP,
+        # device_config['miso'], Pin.IN, Pin.PULL_UP)
 
-        print(device_config)
-        print(lora_parameters)
+        # print(device_config)
+        # print(lora_parameters)
 
         device_spi = SPI(baudrate = 10000000, 
         polarity = 0, phase = 0, bits = 8, firstbit = SPI.MSB,
@@ -50,9 +51,7 @@ class SRRULoRa(object):
         mosi = Pin(device_config['mosi'], Pin.OUT, Pin.PULL_UP),
         miso = Pin(device_config['miso'], Pin.IN, Pin.PULL_UP))
         
-        print("AppEui=>",appEui)
-        print("AppKey=>",appKey)
-        
+      
         self.lora = SX127x(device_spi, pins=device_config, parameters=lora_parameters)
 
     def do_connect(self):
@@ -119,9 +118,9 @@ class SRRULoRa(object):
         #    #    print("collect..")
         #    #    gc.collect()
 
-if __name__ == '__main__':
-    #str(urandom.getrandbits(30))
-    iot = SRRULoRa("","PNHome2","st11ae58*")
-    iot.infinity_life()
-    print("---")
+# if __name__ == '__main__':
+#     #str(urandom.getrandbits(30))
+#     iot = SRRULoRa("","PNHome2","st11ae58*")
+#     iot.infinity_life()
+#     print("---")
 

@@ -16,7 +16,7 @@ device_config = {
     'dio_0':26,
     'reset':23,
     'led':2,
-    'role':0
+    'mode':0
 }
 
 app_config = {

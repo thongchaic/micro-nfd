@@ -9,5 +9,5 @@ payload=> b'\xa4\xe8\xc2\n\xdc\x93\x0b\xd8\x0f\x1e|6\xdb\xa4r\x08\xda\xeb\x01\xe
 import network
 wlan=network.WLAN(network.STA_IF)
 wlan.active(True)
-wlan.connect("CSOffice2")
+wlan.connect("PNHome2","st11ae58*")
 wlan.ifconfig()

@@ -15,11 +15,17 @@ class LoRa(object):
         self.onReceivedJoinInterest = None 
         self.onReceivedJoinData = None 
         
+
+        # device_spi = SPI(baudrate = 10000000, 
+        #     polarity = 0, phase = 0, bits = 8, firstbit = SPI.MSB,
+        #     sck = Pin(device_config['sck'], Pin.OUT, Pin.PULL_DOWN),
+        #     mosi = Pin(device_config['mosi'], Pin.OUT, Pin.PULL_UP),
+        #     miso = Pin(device_config['miso'], Pin.IN, Pin.PULL_UP))
         device_spi = SoftSPI(baudrate = 10000000, 
-            polarity = 0, phase = 0, bits = 8, firstbit = SoftSPI.MSB,
-            sck = Pin(device_config['sck'], Pin.OUT, Pin.PULL_DOWN),
-            mosi = Pin(device_config['mosi'], Pin.OUT, Pin.PULL_UP),
-            miso = Pin(device_config['miso'], Pin.IN, Pin.PULL_UP))
+        polarity = 0, phase = 0, bits = 8, firstbit = SoftSPI.MSB,
+        sck = Pin(device_config['sck'], Pin.OUT, Pin.PULL_DOWN),
+        mosi = Pin(device_config['mosi'], Pin.OUT, Pin.PULL_UP),
+        miso = Pin(device_config['miso'], Pin.IN, Pin.PULL_UP))
 
         i=5
         while i > 0:
@@ -30,8 +36,11 @@ class LoRa(object):
         self.lora = SX127x(device_spi, pins=device_config, parameters=lora_parameters)
         self.fid = fid
         self.stop = False 
+        self.on_send = False
         time.sleep(1)
+        #self.lora.on_receive(self.on_receive)
         _thread.start_new_thread(self.daemon,())
+        
 
     def face_id(self):
         return self.fid 
@@ -42,11 +51,12 @@ class LoRa(object):
     def send(self,_type, name, payload):
         if len(payload)<=0:
             return
-
+        self.on_send = True
         hexlify = self.ndn.encode(_type,name,payload)
         print("hexlify=>",hexlify,type(hexlify))
         
         self.lora.println(hexlify, implicit_header=False)
+        self.on_send = False
         
     def receive(self,payload=None):
         if payload is None or len(payload) < 14:
@@ -77,12 +87,18 @@ class LoRa(object):
             if self.onReceivedJoinData:
                 self.onReceivedJoinData(self.fid, p_len, n_len, chksum, name, payload)
 
+    def on_receive(self):
+        print(".",end='')
+
     def daemon(self):
         print("LoRa started....")
         while not self.stop:
-            payload=None 
+            if self.on_send:
+                continue
+            payload=None
             if self.lora.received_packet():
                 payload = self.lora.read_payload()
                 print("payload=>",payload)
                 self.receive(payload)
+            
     
