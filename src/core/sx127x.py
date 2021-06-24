@@ -74,7 +74,7 @@ IRQ_RX_TIME_OUT_MASK = 0x80
 # Buffer size
 MAX_PKT_LENGTH = 255
 
-__DEBUG__ = True
+__DEBUG__ = False 
 class SX127x:
 
     default_parameters = {
@@ -236,7 +236,7 @@ class SX127x:
 
         if isinstance(msg, str):
             message = msg.encode()
-            
+ 
         self.write(message)
 
         self.end_packet()

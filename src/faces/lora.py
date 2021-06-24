@@ -40,10 +40,11 @@ class LoRa(object):
         self.stop = True 
 
     def send(self,_type, name, payload):
-        if len(payload)<14:
+        if len(payload)<=0:
             return
 
         hexlify = self.ndn.encode(_type,name,payload)
+        print("hexlify=>",hexlify,type(hexlify))
         
         self.lora.println(hexlify, implicit_header=False)
         
@@ -52,7 +53,7 @@ class LoRa(object):
             return
         
         pkt_type, f_count, f_index, p_len, n_len, chksum, name, payload = self.ndn.decode(payload)
-
+        print(pkt_type, f_count, f_index, p_len, n_len, chksum)
         if pkt_type is None:
             return 
 
@@ -65,23 +66,23 @@ class LoRa(object):
 
         if pkt_type  == Ndn.INTEREST:
             if self.onRecievedInterest:
-                self.onRecievedInterest(self.fid,f_count, f_index, p_len, n_len, chksum, name, payload)
+                self.onRecievedInterest(self.fid, p_len, n_len, chksum, name, payload)
         elif pkt_type == Ndn.DATA:
             if self.onReceivedData:
-                self.onReceivedData(self.fid,f_count, f_index, p_len, n_len, chksum, name, payload)
+                self.onReceivedData(self.fid, p_len, n_len, chksum, name, payload)
+        elif pkt_type == Ndn.JOIN_INTEREST:
+            if self.onReceivedJoinInterest:
+                self.onReceivedJoinInterest(self.fid, p_len, n_len, chksum, name, payload)
+        elif pkt_type == Ndn.JOIN_DATA:
+            if self.onReceivedJoinData:
+                self.onReceivedJoinData(self.fid, p_len, n_len, chksum, name, payload)
 
-        # elif (Interest.TLV_JOIN_INTEREST & t) == Interest.TLV_JOIN_INTEREST:
-        #     if self.onReceivedJoinInterest:
-        #         self.onReceivedJoinInterest(self.fid, t,c,i,l ,payload)
-        # elif (Interest.TLV_JOIN_DATA & t) == Data.TLV_JOIN_DATA:
-        #     if self.onReceivedJoinData:
-        #         self.onReceivedJoinData(self.fid, t,c,i,l ,payload)
-        
     def daemon(self):
         print("LoRa started....")
         while not self.stop:
+            payload=None 
             if self.lora.received_packet():
                 payload = self.lora.read_payload()
-                #print("payload=>",payload)
+                print("payload=>",payload)
                 self.receive(payload)
     

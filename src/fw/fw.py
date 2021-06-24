@@ -6,6 +6,7 @@ from udp import UDP
 from lora import LoRa
 from face_table import FaceTable
 from routes import Routes
+from ndn import Ndn 
 
 class Forwarder(object):
     def __init__(self,uuid, device_config, lora_parameters):
@@ -33,8 +34,8 @@ class Forwarder(object):
     def addRoute(self,fid,name):
         self.routes.add(fid,name)
 
-    def onRecievedInterest(self,in_face,f_count, f_index, p_len, n_len, chksum, name, payload):
-        print("onRecievedInterest=>",in_face, f_count, f_index, p_len, n_len, chksum, name, payload)
+    def onRecievedInterest(self,in_face, p_len, n_len, chksum, name, payload):
+        print("onRecievedInterest=>",in_face, p_len, n_len, chksum, name, payload)
 
         if name is None: #Unsolicited 
             return
@@ -44,7 +45,7 @@ class Forwarder(object):
         #pit 
         if self.routes.pit(in_face,name):
             #Already in Pit  
-            print(name,"already in PIT!")
+            #print(name,"already in PIT!")
             return
         
         #fwd interest 
@@ -57,40 +58,57 @@ class Forwarder(object):
         #fw interest
         self.sendInterest(in_face,name,payload)
         
-    def onReceivedData(self,in_face,f_count, f_index, p_len, n_len, chksum, name, payload):
-        print("onReceivedData=>",in_face,f_count, f_index, p_len, n_len, chksum, name, payload)
+    def onReceivedData(self,in_face, p_len, n_len, chksum, name, payload):
+        print("onReceivedData=>",in_face, p_len, n_len, chksum, name, payload)
 
-    def onReceivedJoinInterest(self,in_face,pkt_type, f_count, f_index, p_len, n_len, chksum, name, payload):
-        if name is None: #Unsolicited 
-            return
-
-        if accepted:
-           self.sendData(in_face,name,"accepted")
-        else:
-            self.nack(in_face,name,"rejected")
-
-    def onReceivedJoinData(self,fid,pkt_type, f_count, f_index, p_len, n_len, chksum, name, payload):
-        #store EKEY 
-        self.EKEY=payload
-
-    def sendInterest(self,in_face, name,interest):
-        fids = self.routes.get(name)
+    def sendInterest(self,in_face, name, interest):
+        fids = self.routes.get(name) 
         for fid in fids:
             print("sendInterest:",in_face, fid, name)
             if in_face != fid:
                 out_face = self.table.get(fid)
-                out_face.send(name,interest)          
+                out_face.send(Ndn.INTEREST, name, interest)
     
-    def sendData(self, in_face, name, data):
-        fids = self.routes.get(name)
+    def sendData(self, fid, name, data):
+        out_face = self.table.get(fid)
+        if out_face:
+            out_face.send(Ndn.DATA, name, data)
+
+
+    def onReceivedJoinInterest(self,in_face, p_len, n_len, chksum, name, payload):
+        if name is None: #Unsolicited 
+            return
+            
+        print("JoinInterest=>",in_face, p_len, n_len, chksum, name, payload)
+        accepted = True 
+
+        if accepted:
+           self.sendJoinData(in_face,name,"EKEY")
+        else:
+            self.nack(in_face,name,"rejected") 
+    
+    def onReceivedJoinData(self,fid, p_len, n_len, chksum, name, payload):
+        #store EKEY 
+        self.EKEY=payload
+
+    def sendJoinInterest(self, name, interest):
+        fids = self.routes.get(name) 
+        print("fids=>",fids)
         for fid in fids:
-            print("sendData:",in_face, fid, name)
-            if in_face != fid:
-                out_face = self.table.get(fid)
-                out_face.send(name,data)  
-        
-    def nack(self,out_face, name, reason):
-        out_face.send(name,reason)
+            out_face = self.table.get(fid)
+            if out_face:
+                print("Ndn.JOIN_INTEREST=>",name,interest)
+                out_face.send(Ndn.JOIN_INTEREST, name, interest)
+
+    def sendJoinData(self, fid, name, data):
+        out_face = self.table.get(fid)
+        if out_face:
+            out_face.send(Ndn.JOIN_DATA, name, data)
+
+    def nack(self,fid, _type, name, reason):
+        out_face = self.table.get(fid)
+        if out_face:
+            out_face.send(_type,name,data)  
         
     def onReceivedNack(self):
         pass
