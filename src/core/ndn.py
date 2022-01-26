@@ -9,8 +9,8 @@ class Ndn:
     JOIN_REJECTED = 9 
 
 
-    def __init__(self):
-        print("ndn init")
+    def __init__(self, who):
+        print(who,"init!!")
      
     def decode(self, raw="0410ffff05062f68656c6c6f776f726c64"):
         
