@@ -7,10 +7,10 @@ from lora import LoRa
 from face_table import FaceTable
 from routes import Routes
 from ndn import Ndn
-
+#from cs import CS
 
 class Forwarder(object):
-    def __init__(self,uuid, device_config, lora_parameters, app_config):
+    def __init__(self,uuid, device_config, lora_parameters, app_config, doReceive):
 
         self.stop = None 
 
@@ -18,7 +18,10 @@ class Forwarder(object):
         self.UUID=uuid 
         self.table = FaceTable()
         self.routes = Routes()
+        #self.cs = CS()
+
         self.accepted = False
+        self.doReceive = doReceive
 
         self.lora = LoRa(self.fid, device_config, lora_parameters)
         self.lora.onRecievedInterest = self.onRecievedInterest
@@ -44,6 +47,8 @@ class Forwarder(object):
             return
         
         #no cs implemented
+        #if self.cs.match()
+
 
         #pit 
         if self.routes.pit(in_face,name):
@@ -57,12 +62,17 @@ class Forwarder(object):
             print(name, "no routes")
             self.nack(in_face, name,'no routes')
             return
+        
+        #registed app : return data 
+        
 
         #fw interest
         self.sendInterest(in_face,name,payload)
         
     def onReceivedData(self,in_face, p_len, n_len, chksum, name, payload):
-        print("onReceivedData=>",in_face, p_len, n_len, chksum, name, payload)
+        #print("onReceivedData=>",in_face, p_len, n_len, chksum, name, payload)
+        if self.doReceive:
+            self.doReceive(in_face, p_len, n_len, chksum, name, payload)
 
     def sendInterest(self,in_face, name, interest):
         fids = self.routes.get(name) 
