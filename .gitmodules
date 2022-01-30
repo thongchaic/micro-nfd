@@ -1,3 +1,6 @@
 [submodule "webrepl"]
 	path = webrepl
 	url = https://github.com/micropython/webrepl.git
+[submodule "ampy"]
+	path = ampy
+	url = https://github.com/adafruit/ampy.git

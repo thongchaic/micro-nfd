@@ -6,16 +6,19 @@ from udp import UDP
 from lora import LoRa
 from face_table import FaceTable
 from routes import Routes
-from ndn import Ndn 
+from ndn import Ndn
+
 
 class Forwarder(object):
-    def __init__(self,uuid, device_config, lora_parameters):
+    def __init__(self,uuid, device_config, lora_parameters, app_config):
+
+        self.stop = None 
 
         self.fid = 1
         self.UUID=uuid 
         self.table = FaceTable()
         self.routes = Routes()
-        self.EKEY = None
+        self.accepted = False
 
         self.lora = LoRa(self.fid, device_config, lora_parameters)
         self.lora.onRecievedInterest = self.onRecievedInterest
@@ -68,7 +71,7 @@ class Forwarder(object):
             if in_face != fid:
                 out_face = self.table.get(fid)
                 out_face.send(Ndn.INTEREST, name, interest)
-    
+    #accepted
     def sendData(self, fid, name, data):
         out_face = self.table.get(fid)
         if out_face:
@@ -83,26 +86,31 @@ class Forwarder(object):
         accepted = True 
 
         if accepted:
-           self.sendJoinData(in_face,name,"EKEY")
+           self.sendJoinData(in_face,name,payload)
         else:
             self.nack(in_face,name,"rejected") 
     
     def onReceivedJoinData(self,fid, p_len, n_len, chksum, name, payload):
         #store EKEY 
-        self.EKEY=payload
+        self.accepted=True 
+        print("Accetped : ", payload)
+        #app_config['EKEY'] = payload
+        self.stop = time.ticks_ms()
+
 
     def sendJoinInterest(self, name, interest):
         fids = self.routes.get(name) 
-        print("fids=>",fids)
+        #print("fids=>",fids)
         for fid in fids:
             out_face = self.table.get(fid)
             if out_face:
-                print("Ndn.JOIN_INTEREST=>",name,interest)
+                print("sendJoinInterest=>",name,interest)
                 out_face.send(Ndn.JOIN_INTEREST, name, interest)
 
     def sendJoinData(self, fid, name, data):
         out_face = self.table.get(fid)
         if out_face:
+            print("sendJoinData=>",name,data)
             out_face.send(Ndn.JOIN_DATA, name, data)
 
     def nack(self,fid, _type, name, reason):

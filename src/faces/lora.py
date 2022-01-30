@@ -9,18 +9,18 @@ from ndn import Ndn
 class LoRa(object):
     def __init__(self, fid, device_config, lora_parameters):
 
-        self.ndn = Ndn()
+        self.ndn = Ndn("LoRa")
         self.onRecievedInterest = None
         self.onReceivedData = None
         self.onReceivedJoinInterest = None 
         self.onReceivedJoinData = None 
         
-
         # device_spi = SPI(baudrate = 10000000, 
         #     polarity = 0, phase = 0, bits = 8, firstbit = SPI.MSB,
         #     sck = Pin(device_config['sck'], Pin.OUT, Pin.PULL_DOWN),
         #     mosi = Pin(device_config['mosi'], Pin.OUT, Pin.PULL_UP),
         #     miso = Pin(device_config['miso'], Pin.IN, Pin.PULL_UP))
+
         device_spi = SoftSPI(baudrate = 10000000, 
         polarity = 0, phase = 0, bits = 8, firstbit = SoftSPI.MSB,
         sck = Pin(device_config['sck'], Pin.OUT, Pin.PULL_DOWN),
@@ -41,7 +41,6 @@ class LoRa(object):
         #self.lora.on_receive(self.on_receive)
         _thread.start_new_thread(self.daemon,())
         
-
     def face_id(self):
         return self.fid 
     
@@ -53,7 +52,7 @@ class LoRa(object):
             return
         self.on_send = True
         hexlify = self.ndn.encode(_type,name,payload)
-        print("hexlify=>",hexlify,type(hexlify))
+        print("hexlify=>",hexlify)
         
         self.lora.println(hexlify, implicit_header=False)
         self.on_send = False
@@ -61,7 +60,7 @@ class LoRa(object):
     def receive(self,payload=None):
         if payload is None or len(payload) < 14:
             return
-        
+        print("payload=>",payload)
         pkt_type, f_count, f_index, p_len, n_len, chksum, name, payload = self.ndn.decode(payload)
         print(pkt_type, f_count, f_index, p_len, n_len, chksum)
         if pkt_type is None:
@@ -72,7 +71,7 @@ class LoRa(object):
             #--reassembly process
             return 
 
-        #print("decoded=>",pkt_type, f_count, f_index, p_len, n_len, chksum, name, payload)
+        print("decoded=>",pkt_type, f_count, f_index, p_len, n_len, chksum, name, payload)
 
         if pkt_type  == Ndn.INTEREST:
             if self.onRecievedInterest:
@@ -91,14 +90,13 @@ class LoRa(object):
         print(".",end='')
 
     def daemon(self):
-        print("LoRa started....")
+        print("********** LoRa started **********")
         while not self.stop:
             if self.on_send:
                 continue
             payload=None
             if self.lora.received_packet():
                 payload = self.lora.read_payload()
-                print("payload=>",payload)
                 self.receive(payload)
             
     

@@ -19,11 +19,6 @@ device_config = {
     'mode':0
 }
 
-app_config = {
-    'loop': 200,
-    'sleep': 100
-}
-
 lora_parameters = {
     'frequency': 9232E6, 
     'tx_power_level': 14, 
@@ -35,6 +30,12 @@ lora_parameters = {
     'sync_word': 0x12, 
     'enable_CRC': False,
     'invert_IQ': False
+}
+
+app_config = {
+    'mode'      : 0,  # 0 = Gateway,  1 = Mote 
+    'owner_id'  : 'thongchai',
+    'EKEY'      : '0afd80709' 
 }
 
 wifi_config = {
