@@ -29,17 +29,15 @@ class MicroNFD(object):
         self.fwd = Forwarder(self.UUID, device_config, lora_parameters, app_config, 
                             self.doReceive)
        
-
         #ping app 
         self.ping = PingApp("/alice/ping")
+        self.fwd.addFaceTable(2, self.ping)
         
     # def nfdc(self):
     #     #Easy to manage partial name  
 
     #     self.fwd.addRoute(1,"/alice/join")
     #     #self.fwd.addRoute(1,"/alice/light/status")
-
-        
 
     def joinInterst(self):
         #NDN-LPWAN JoinInterest Procedure 
@@ -59,9 +57,12 @@ class MicroNFD(object):
     def doReceive(self,in_face, p_len, n_len, chksum, name, payload):
         print(in_face, p_len, n_len, chksum, name, payload)
 
-        #Ping App 
+        #Ping App : receive data 
         if self.ping.satisfied(name):
-            print("Ping Data Returned")
+            #self.ping.set_time( time.ticks_ms() )
+            self.ping.received_at = time.ticks_ms()
+        
+
         #Other App .... 
 
     #----------- experiments only -------------
@@ -100,8 +101,11 @@ class MicroNFD(object):
         n = 40 
         while n > 0:
             payload = str(urandom.random())
+            self.ping.sended_at = time.ticks_ms()
             self.doSend( self.ping.get_name(), payload )
+            
             n = n - 1 
+            time.sleep(2)
 
         # if not self.fwd.EKEY:
         #     print("No joinInterst returned!!")

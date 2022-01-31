@@ -24,11 +24,12 @@ class Forwarder(object):
         self.doReceive = doReceive
 
         self.lora = LoRa(self.fid, device_config, lora_parameters)
-        self.lora.onRecievedInterest = self.onRecievedInterest
-        self.lora.onReceivedData = self.onReceivedData
+        # self.lora.onRecievedInterest = self.onRecievedInterest
+        # self.lora.onReceivedData = self.onReceivedData
         self.lora.onReceivedJoinInterest = self.onReceivedJoinInterest
         self.lora.onReceivedJoinData = self.onReceivedJoinData
-        self.table.add(self.fid, self.lora)
+        self.addFaceTable(self.fid, self.lora)
+        
 
         # if device_config['role']==1:
         #     self.fid = self.fid+1
@@ -39,6 +40,10 @@ class Forwarder(object):
 
     def addRoute(self,fid,name):
         self.routes.add(fid,name)
+    def addFaceTable(self, fid, obj):
+        self.table.add(fid, obj)
+        obj.onRecievedInterest = self.onRecievedInterest
+        obj.onReceivedData = self.onReceivedData
 
     def onRecievedInterest(self,in_face, p_len, n_len, chksum, name, payload):
         print("onRecievedInterest=>",in_face, p_len, n_len, chksum, name, payload)
@@ -64,7 +69,7 @@ class Forwarder(object):
             return
         
         #registed app : return data 
-        
+    
 
         #fw interest
         self.sendInterest(in_face,name,payload)
