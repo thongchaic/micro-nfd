@@ -34,7 +34,10 @@ class Routes(object):
 
         if fid not in self.routes[name]:
             self.routes[name].append(fid)
-
+        return True
+    def in_pit(self, name):
+        if name not in self.routes:
+            return False
         return True
     
     def satisfied(self, fid, name):#Deprecated

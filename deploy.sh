@@ -1,10 +1,9 @@
 #!/bin/bash
 
 IP=192.168.1.82
-#IP=192.168.1.82
 
-#FILES=('./src/nfd.py' './src/main.py' './src/faces/routes.py' './src/config/config.py' './src/fw/fw.py' './src/core/ndn.py' './src/core/sx127x.py' './src/faces/udp.py' './src/faces/face_table.py' './src/faces/lora.py' './src/misc/experiments.py')
-FILES=('./src/main.py' './src/nfd.py' './src/fw/fw.py')
+#FILES=('./src/nfd.py' './src/faces/routes.py' './src/config/config.py' './src/fw/fw.py' './src/core/ndn.py' './src/core/sx127x.py' './src/faces/udp.py' './src/faces/face_table.py' './src/faces/lora.py' './src/misc/experiments.py')
+FILES=('./src/nfd.py' './src/misc/ping.py' './src/fw/fw.py')
 
 kill_proc(){
     exit
@@ -20,3 +19,4 @@ do
 done
 
 # ./webrepl/webrepl_cli.py ./src/misc/wifi.py $IP:main.py -p good2cu
+

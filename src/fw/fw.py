@@ -14,7 +14,6 @@ class Forwarder(object):
 
         self.stop = None 
 
-        self.fid = 1
         self.UUID=uuid 
         self.table = FaceTable()
         self.routes = Routes()
@@ -23,12 +22,12 @@ class Forwarder(object):
         self.accepted = False
         self.doReceive = doReceive
 
-        self.lora = LoRa(self.fid, device_config, lora_parameters)
+        self.lora = LoRa(1, device_config, lora_parameters)
         # self.lora.onRecievedInterest = self.onRecievedInterest
         # self.lora.onReceivedData = self.onReceivedData
         self.lora.onReceivedJoinInterest = self.onReceivedJoinInterest
         self.lora.onReceivedJoinData = self.onReceivedJoinData
-        self.addFaceTable(self.fid, self.lora)
+        self.addFaceTable(1, self.lora)
         
 
         # if device_config['role']==1:
@@ -53,8 +52,7 @@ class Forwarder(object):
         
         #no cs implemented
         #if self.cs.match()
-
-
+        
         #pit 
         if self.routes.pit(in_face,name):
             #Already in Pit  
@@ -76,14 +74,23 @@ class Forwarder(object):
         
     def onReceivedData(self,in_face, p_len, n_len, chksum, name, payload):
         #print("onReceivedData=>",in_face, p_len, n_len, chksum, name, payload)
-        if self.doReceive:
-            self.doReceive(in_face, p_len, n_len, chksum, name, payload)
+        if self.routes.in_pit(name):
+            fids = self.routes.get(name) 
+            for fid in fids:
+                if in_face != fid:
+                    print("fw Data:",in_face, fid, name, payload)
+                    out_face = self.table.get(fid)
+                    out_face.send(Ndn.DATA, name, payload)
+                else:
+                    if self.doReceive:
+                        self.doReceive(in_face, p_len, n_len, chksum, name, payload)
+                        self.routes.satisfied(fid, name)
 
     def sendInterest(self,in_face, name, interest):
         fids = self.routes.get(name) 
         for fid in fids:
-            print("sendInterest:",in_face, fid, name)
             if in_face != fid:
+                print("sendInterest:",in_face, fid, name, interest)
                 out_face = self.table.get(fid)
                 out_face.send(Ndn.INTEREST, name, interest)
     #accepted

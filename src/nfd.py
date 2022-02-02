@@ -19,7 +19,7 @@ from ping import PingApp
 class MicroNFD(object):
     # 1 Gw
     # 0 Sensor
-    def __init__(self,role=0):
+    def __init__(self):
         self.UUID = ubinascii.hexlify( machine.unique_id() ).decode()
         # self.manager = WifiManager(wifi_config)
         # self.manager.connect()
@@ -30,7 +30,7 @@ class MicroNFD(object):
                             self.doReceive)
        
         #ping app 
-        self.ping = PingApp("/alice/ping")
+        self.ping = PingApp(2, "/alice/ping")
         self.fwd.addFaceTable(2, self.ping)
         
     # def nfdc(self):
@@ -51,18 +51,16 @@ class MicroNFD(object):
     def joinRejected(self):
         pass
 
-    def doSend(self, name, payload):
-        self.fwd.sendInterest(name,payload)
+    def doSend(self, in_face,  name, payload):
+        self.fwd.sendInterest(in_face, name,payload)
     
     def doReceive(self,in_face, p_len, n_len, chksum, name, payload):
-        print(in_face, p_len, n_len, chksum, name, payload)
+        print("nfd.receiced:", in_face, p_len, n_len, chksum, name, payload)
 
         #Ping App : receive data 
         if self.ping.satisfied(name):
             #self.ping.set_time( time.ticks_ms() )
             self.ping.received_at = time.ticks_ms()
-        
-
         #Other App .... 
 
     #----------- experiments only -------------
@@ -71,6 +69,11 @@ class MicroNFD(object):
         self.fwd.addRoute(1,"/alice/join")
         #ping app name 
         self.fwd.addRoute(2,self.ping.get_name())
+
+        # print("------PING.START-----")
+        # time.sleep(2)
+        # payload = str(urandom.random())
+        # self.doSend( None, self.ping.get_name(), payload )
 
     #Mote
     def mote(self):
