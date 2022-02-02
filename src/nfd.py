@@ -78,8 +78,8 @@ class MicroNFD(object):
     #Mote
     def mote(self):
         self.fwd.addRoute(1,"/alice/join")
-
-
+        self.fwd.addRoute(1,self.ping.get_name())
+        
         n = 40
         while n > 0:
             start = time.ticks_ms()
