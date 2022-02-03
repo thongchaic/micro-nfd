@@ -79,36 +79,41 @@ class MicroNFD(object):
     def mote(self):
         self.fwd.addRoute(1,"/alice/join")
         self.fwd.addRoute(1,self.ping.get_name())
-        
-        n = 40
-        while n > 0:
-            start = time.ticks_ms()
-            self.joinInterst()
-            timeout=3
-            success = False 
+        #self.fwd.addRoute(2,self.ping.get_name())
 
-            while timeout>0:
-                print(timeout,'.',end=' ')
-                if self.fwd.accepted:
-                    success = True 
-                    break 
-                timeout=timeout-1
-                time.sleep(1)
-            stop = time.ticks_ms()
-            if self.fwd.stop:
-                stop = self.fwd.stop
-            self.exp.write_n_close(n, start, stop, success)
-            n = n - 1
-            time.sleep(2)
+        payload = str(urandom.random())
+        self.doSend( self.ping.fid , self.ping.get_name(), payload )
 
-        n = 40 
-        while n > 0:
-            payload = str(urandom.random())
-            self.ping.sended_at = time.ticks_ms()
-            self.doSend( self.ping.get_name(), payload )
+
+        # n = 40
+        # while n > 0:
+        #     start = time.ticks_ms()
+        #     self.joinInterst()
+        #     timeout=3
+        #     success = False 
+
+        #     while timeout>0:
+        #         print(timeout,'.',end=' ')
+        #         if self.fwd.accepted:
+        #             success = True 
+        #             break 
+        #         timeout=timeout-1
+        #         time.sleep(1)
+        #     stop = time.ticks_ms()
+        #     if self.fwd.stop:
+        #         stop = self.fwd.stop
+        #     self.exp.write_n_close(n, start, stop, success)
+        #     n = n - 1
+        #     time.sleep(2)
+
+        # n = 40 
+        # while n > 0:
+        #     payload = str(urandom.random())
+        #     self.ping.sended_at = time.ticks_ms()
+        #     self.doSend( self.ping.get_name(), payload )
             
-            n = n - 1 
-            time.sleep(2)
+        #     n = n - 1 
+        #     time.sleep(2)
 
         # if not self.fwd.EKEY:
         #     print("No joinInterst returned!!")

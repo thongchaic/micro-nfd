@@ -15,7 +15,7 @@ class PingApp:
     def satisfied(self,name):
         if name in self.name:
             return True 
-        return False 
+        return False
     def send(self,_type,name,payload):
         #p_len, n_len, chksum, name, payload
         if len(payload)<=0:
@@ -30,5 +30,7 @@ class PingApp:
         #print("send()=>onReceivedData(",self.fid, p_len, n_len, _type,name,payload,")")
         #pkt_type, f_count, f_index, p_len, n_len, chksum, name, payload = self.ndn.decode(payload)
         self.onReceivedData(self.fid, p_len, n_len, chksum, name, payload)
+    def receive(self, _type,name,payload):
+        pass 
      
     

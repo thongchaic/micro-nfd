@@ -31,10 +31,11 @@ class Routes(object):
         if name not in self.routes:
             self.add(fid,name)
             return False
-
         if fid not in self.routes[name]:
             self.routes[name].append(fid)
+
         return True
+        
     def in_pit(self, name):
         if name not in self.routes:
             return False

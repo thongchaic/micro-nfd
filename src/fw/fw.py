@@ -6,6 +6,7 @@ from udp import UDP
 from lora import LoRa
 from face_table import FaceTable
 from routes import Routes
+from pit import Pit
 from ndn import Ndn
 #from cs import CS
 
@@ -17,6 +18,7 @@ class Forwarder(object):
         self.UUID=uuid 
         self.table = FaceTable()
         self.routes = Routes()
+        self.pit = Pit()
         #self.cs = CS()
 
         self.accepted = False
@@ -39,6 +41,7 @@ class Forwarder(object):
 
     def addRoute(self,fid,name):
         self.routes.add(fid,name)
+
     def addFaceTable(self, fid, obj):
         self.table.add(fid, obj)
         obj.onRecievedInterest = self.onRecievedInterest
@@ -54,10 +57,13 @@ class Forwarder(object):
         #if self.cs.match()
         
         #pit 
-        if self.routes.pit(in_face,name):
-            #Already in Pit  
-            #print(name,"already in PIT!")
-            return
+        if self.pit.in_pit(name):
+            return 
+
+        # if self.routes.pit(in_face,name):
+        #     #Already in Pit  
+        #     #print(name,"already in PIT!")
+        #     return
         
         #fwd interest 
         if not self.routes.match(name):
@@ -67,32 +73,33 @@ class Forwarder(object):
             return
         
         #registed app : return data 
-    
 
         #fw interest
         self.sendInterest(in_face,name,payload)
         
     def onReceivedData(self,in_face, p_len, n_len, chksum, name, payload):
         #print("onReceivedData=>",in_face, p_len, n_len, chksum, name, payload)
-        if self.routes.in_pit(name):
-            fids = self.routes.get(name) 
+        if self.pit.in_pit(name):
+            fids = self.pit.get(name) 
             for fid in fids:
                 if in_face != fid:
-                    print("fw Data:",in_face, fid, name, payload)
+                    print("fw.Data:",in_face, fid, name, payload)
                     out_face = self.table.get(fid)
                     out_face.send(Ndn.DATA, name, payload)
-                else:
-                    if self.doReceive:
-                        self.doReceive(in_face, p_len, n_len, chksum, name, payload)
-                        self.routes.satisfied(fid, name)
+                    self.pit.satisfied(fid, name)
 
     def sendInterest(self,in_face, name, interest):
         fids = self.routes.get(name) 
+        forwarded = False
         for fid in fids:
             if in_face != fid:
+                forwarded = True 
                 print("sendInterest:",in_face, fid, name, interest)
                 out_face = self.table.get(fid)
                 out_face.send(Ndn.INTEREST, name, interest)
+        if forwarded:
+            self.pit.add(in_face, name)
+
     #accepted
     def sendData(self, fid, name, data):
         out_face = self.table.get(fid)
