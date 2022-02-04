@@ -1,12 +1,15 @@
 class Pit:
     
     def __init__(self):
-        print("pit init")
+        print("init...pit...")
         self.pit = {}
     
     def add(self, fid, name):
-        pirnt("pit.add:",name, fid)
-        self.pit[name] = [fid]
+        if name in self.pit:
+            if fid not in self.pit[name]:
+                self.pit[name].append(fid)
+        else:
+            self.pit[name] = [fid]
 
     def get(self, name):
         if self.pit[name]:
@@ -21,6 +24,8 @@ class Pit:
     def satisfied(self, name):
         if name in self.pit:
             self.pit.pop(name)
+            return True 
+        return False 
     
     
 

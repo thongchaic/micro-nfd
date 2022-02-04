@@ -10,11 +10,11 @@ import time
 import urandom 
 import ubinascii
 import machine
-from fw import Forwarder
 # from wifi_manager import WifiManager
 from config import * 
 from experiments import ExperimentalData
 from ping import PingApp
+from fw import Forwarder
 
 class MicroNFD(object):
     # 1 Gw
@@ -31,7 +31,7 @@ class MicroNFD(object):
        
         #ping app 
         self.ping = PingApp(2, "/alice/ping")
-        self.fwd.addFaceTable(2, self.ping)
+        self.fwd.addFaceTable(self.ping.fid, self.ping)
         
     # def nfdc(self):
     #     #Easy to manage partial name  
@@ -51,29 +51,27 @@ class MicroNFD(object):
     def joinRejected(self):
         pass
 
-    def doSend(self, in_face,  name, payload):
-        self.fwd.sendInterest(in_face, name,payload)
+    # def doSend(self, in_face,  name, payload):
+    #     self.fwd.sendInterest(in_face, name,payload)
     
+    #App Received 
     def doReceive(self,in_face, p_len, n_len, chksum, name, payload):
         print("nfd.receiced:", in_face, p_len, n_len, chksum, name, payload)
-
-        #Ping App : receive data 
-        if self.ping.satisfied(name):
-            #self.ping.set_time( time.ticks_ms() )
-            self.ping.received_at = time.ticks_ms()
+        #Ping App : GW   
+        if self.ping.match(name):
+           #self.ping.receiced(name, payload)
+           #Response 
+           time.sleep(2)
+           self.fwd.sendData(name, 'X.'+payload.decode())
+           #
+           #self.doSend(self.ping.fid , self.ping.get_name(), 'X.'+payload.decode())
         #Other App .... 
 
     #----------- experiments only -------------
     #Gateway
     def gateway(self):
         self.fwd.addRoute(1,"/alice/join")
-        #ping app name 
         self.fwd.addRoute(2,self.ping.get_name())
-
-        # print("------PING.START-----")
-        # time.sleep(2)
-        # payload = str(urandom.random())
-        # self.doSend( None, self.ping.get_name(), payload )
 
     #Mote
     def mote(self):
@@ -81,9 +79,12 @@ class MicroNFD(object):
         self.fwd.addRoute(1,self.ping.get_name())
         #self.fwd.addRoute(2,self.ping.get_name())
 
-        payload = str(urandom.random())
-        self.doSend( self.ping.fid , self.ping.get_name(), payload )
-
+        time.sleep(2)
+        while True:
+            payload = 'Y'+str(urandom.random())
+            #self.doSend( self.ping.fid , self.ping.get_name(), payload )
+            self.fwd.sendInterest(self.ping.fid , self.ping.get_name(), payload)
+            time.sleep(15)
 
         # n = 40
         # while n > 0:

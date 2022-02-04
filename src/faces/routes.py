@@ -26,27 +26,3 @@ class Routes(object):
         if name not in self.routes:
             return False
         return True
-
-    def pit(self, fid, name):
-        if name not in self.routes:
-            self.add(fid,name)
-            return False
-        if fid not in self.routes[name]:
-            self.routes[name].append(fid)
-
-        return True
-        
-    def in_pit(self, name):
-        if name not in self.routes:
-            return False
-        return True
-    
-    def satisfied(self, fid, name):#Deprecated
-        if name not in self.routes:
-            return
-        if fid not in self.routes[name]:
-            return
-        self.routes[name].pop(fid)
-        if len(routes[name]) <= 0:
-            self.remove(name)
-        

@@ -1,4 +1,3 @@
-from nfd import MicroNFD
 import time 
 import network
 
@@ -11,13 +10,8 @@ while not wlan.isconnected():
 print("")
 print(wlan.ifconfig())
 
-# nfd = MicroNFD()
-# nfd.gateway()
+from nfd import MicroNFD
 
-# w=5
-# while w>0:
-#     time.sleep(1)
-#     print("w:",w)
-#     w=w-1
+nfd = MicroNFD()
+nfd.gateway()
 
-# nfd.mote()

@@ -31,6 +31,9 @@ class Ndn:
             name = binascii.unhexlify( raw[ 12:(12+(n_len*2)) ])
             payload = binascii.unhexlify( raw[(12+(n_len*2)):])
             
+            name = name.decode() if isinstance(name, (bytes)) else name
+            payload = payload.decode() if isinstance(payload, (bytes)) else payload
+            
             return pkt_type, f_count, f_index, p_len, n_len, chksum, name, payload
         except:
             return None, None, None, None, None, None, None, None 

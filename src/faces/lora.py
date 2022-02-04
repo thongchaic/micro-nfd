@@ -1,14 +1,15 @@
-import _thread
+#import _thread
 import time 
 from machine import Pin, SoftSPI, UART
 from sx127x import SX127x
 from ndn import Ndn
-
+import gc 
 #ESP32 TTGOv1 
 
 class LoRa(object):
     def __init__(self, fid, device_config, lora_parameters):
 
+        gc.enable()
         self.ndn = Ndn("LoRa")
         self.onRecievedInterest = None
         self.onReceivedData = None
@@ -38,8 +39,7 @@ class LoRa(object):
         self.stop = False 
         self.on_send = False
         time.sleep(1)
-        #self.lora.on_receive(self.on_receive)
-        _thread.start_new_thread(self.daemon,())
+        #_thread.start_new_thread(self.daemon,())
         
     def face_id(self):
         return self.fid 
@@ -48,16 +48,18 @@ class LoRa(object):
         self.stop = True 
 
     def send(self,_type, name, payload):
+       
         if len(payload)<=0:
             return
+        gc.collect()
         self.on_send = True
         hexlify = self.ndn.encode(_type,name,payload)
-        print("hexlify=>",hexlify)
-        
         self.lora.println(hexlify, implicit_header=False)
         self.on_send = False
         
     def receive(self,payload=None):
+        if self.on_send:
+            return 
         if payload is None or len(payload) < 14:
             return
         print("payload=>",payload)
@@ -66,10 +68,10 @@ class LoRa(object):
         if pkt_type is None:
             return 
 
-        if f_count != (f_index+1):
-            #--TODO-- 
-            #--reassembly process
-            return 
+        # if f_count != (f_index+1):
+        #     #--TODO-- 
+        #     #--reassembly process
+        #     return 
 
         print("decoded=>",pkt_type, f_count, f_index, p_len, n_len, chksum, name, payload)
 
@@ -86,17 +88,20 @@ class LoRa(object):
             if self.onReceivedJoinData:
                 self.onReceivedJoinData(self.fid, p_len, n_len, chksum, name, payload)
 
-    def on_receive(self):
-        print(".",end='')
-
     def daemon(self):
-        print("********** LoRa started **********")
-        while not self.stop:
-            if self.on_send:
-                continue
-            payload=None
-            if self.lora.received_packet():
-                payload = self.lora.read_payload()
-                self.receive(payload)
+        if self.on_send:
+            return 
+        payload=None
+        if self.lora.received_packet():
+            payload = self.lora.read_payload()
+            self.receive(payload)
             
-    
+    # def daemon(self):
+    #     print("********** LoRa started **********")
+    #     while not self.stop:
+    #         if self.on_send:
+    #             continue
+    #         payload=None
+    #         if self.lora.received_packet():
+    #             payload = self.lora.read_payload()
+    #             self.receive(payload)   
