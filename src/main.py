@@ -10,8 +10,11 @@ while not wlan.isconnected():
 print("")
 print(wlan.ifconfig())
 
+#import os
+#os.remove('data.csv')
+
 from nfd import MicroNFD
 
 nfd = MicroNFD()
-nfd.gateway()
+nfd.mote()
 

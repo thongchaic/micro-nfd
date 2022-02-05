@@ -26,6 +26,9 @@ class Pit:
             self.pit.pop(name)
             return True 
         return False 
+    def daemon(self):
+        #check timeout 
+        pass 
     
     
 

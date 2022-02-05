@@ -1,6 +1,7 @@
 import binascii
 
 class Ndn:
+    MAX_PKT_LENGTH=255 #defined by the sx127x.py library 
     INTEREST = 4
     DATA = 5
     NACK = 6 
@@ -9,8 +10,8 @@ class Ndn:
     JOIN_REJECTED = 9 
 
 
-    def __init__(self, who):
-        print(who,"init!!")
+    def __init__(self):
+        print("Init...NDN....")
      
     def decode(self, raw="0410ffff05062f68656c6c6f776f726c64"):
         
@@ -44,7 +45,7 @@ class Ndn:
         #chksum = binascii.hexlify( chr(x)+chr(y) )
         return b'ffff'
 
-    def encode(self,_type,name,payload):
+    def encode(self,_type,c,i,name,payload):
         #Header + Payload 
         '''
             | parse 32 bits header 
@@ -57,8 +58,8 @@ class Ndn:
         '''
         #no fragmentation & reassembly 
         chksum = self.chksum(payload)
-        f_count = 1 #Single Fragment
-        f_index = 0 #Index of the Fragment 
+        f_count = c #Single Fragment
+        f_index = i #Index of the Fragment 
         f_count = f_count << 4 
         opt = f_count | f_index 
         p_len = len(payload)
