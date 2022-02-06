@@ -3,7 +3,7 @@
 IP=192.168.1.113
 
 #FILES=('./src/nfd.py' './src/main.py' './src/misc/ping.py' './src/faces/routes.py' './src/config/config.py' './src/fw/fw.py' './src/core/ndn.py' './src/core/sx127x.py' './src/faces/face_table.py' './src/faces/lora.py' './src/utils/pit.py'  './src/misc/experiments.py')
-FILES=('./src/faces/lora.py')
+FILES=('./src/main.py')
 
 kill_proc(){
     exit

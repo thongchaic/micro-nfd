@@ -9,7 +9,13 @@ class PingApp:
         self.onRecievedInterest = None
         self.onReceivedData = None  
 
-        self.pkt_size=None
+        self.pkt_size=-1
+        self.payload_size=-1
+
+        self.seed="TheQuickBrownFoxesJumpOverTheLazyDogs."
+        for i in range(10):
+            self.seed += "TheQuickBrownFoxesJumpOverTheLazyDogs."
+        print("seed:",len(self.seed))
 
     def get_name(self):
         return self.name
@@ -25,17 +31,18 @@ class PingApp:
         n_len = 1
         chksum = 0xFF
         if payload.startswith("Q"):
-            
-            payload=payload.replace('Q','A')
-            print("Ping resp:",payload)
+            fetch_size=int(payload.replace('Q',''))
+            #print("Ping resp:",payload)
             #Response ping message =>
-            seed="TheQuickBrownFoxesJumpOverTheLazyDogs.TheQuickBrownFoxesJumpOverTheLazyDogs.TheQuickBrownFoxesJumpOverTheLazyDogs.TheQuickBrownFoxesJumpOverTheLazyDogs.TheQuickBrownFoxesJumpOverTheLazyDogs.TheQuickBrownFoxesJumpOverTheLazyDogs."
-
+            #generate payload 
+            payload = self.seed[0:fetch_size]
+            #print("Response Data:",payload)
             self.onReceivedData(self.fid, p_len, n_len, chksum, name, payload)
         else:
             self.received_at = time.ticks_ms()
+            self.payload_size = len(payload)
             if opt:
                 self.pkt_size=opt
             else:
-                self.pkt_size=None
-            print("Ping Finished:", self.sended_at, self.received_at, payload)
+                self.pkt_size=-1
+            print("Data Received:", payload)

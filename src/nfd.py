@@ -62,62 +62,57 @@ class MicroNFD(object):
         time.sleep(2)
         gc.collect()
         print("======================BOOTSTRAP======================")
-        # n = 35
-        # n_size = len("/alice/join")
-        # while n > 0:
-        #     start = time.ticks_ms()
-        #     # self.fwd.pkt_size = 0
-        #     # self.fwd.payload_size = 0
-        #     self.joinInterst()
-        #     timeout=5
-        #     while timeout>0:
-        #         print(timeout,'.',end=' ')
-        #         print('')
-        #         if self.fwd.accepted:
-        #             break 
-        #         timeout=timeout-1
-        #         time.sleep(1)
-        #     stop = time.ticks_ms()
-        #     payload_size=self.fwd.payload_size
-        #     pkt_size=self.fwd.pkt_size
-        #     if self.fwd.stop:
-        #         stop = self.fwd.stop
+        n = 35
+        n_size = len("/alice/join")
+        while n > 0:
+            start = time.ticks_ms()
+            # self.fwd.pkt_size = 0
+            # self.fwd.payload_size = 0
+            self.joinInterst()
+            timeout=10
+            while timeout>0:
+                print(timeout,'.',end=' ')
+                
+                if self.fwd.accepted:
+                    break 
+                timeout=timeout-1
+                time.sleep(1)
+            stop = time.ticks_ms()
+            payload_size=self.fwd.payload_size
+            pkt_size=self.fwd.pkt_size
+            if self.fwd.stop:
+                stop = self.fwd.stop
 
-        #     self.exp.write_n_close("bootstrap",n,start,stop,n_size,payload_size,pkt_size)
-        #     n = n - 1
-        #     time.sleep(1)
+            self.exp.write_n_close("bootstrap",n,start,stop,n_size,payload_size,pkt_size)
+            print('')
+            n = n - 1
+            time.sleep(1)
 
-        # time.sleep(3)
-        #gc.collect()
+        time.sleep(3)
+        gc.collect()
         print("======================DELAY======================")
-        # self.hash.update(str(urandom.random()))
-        # seed = ubinascii.hexlify( self.hash.digest() ).decode()
-        # self.hash.update(str(urandom.random()))
-        # seed += ubinascii.hexlify( self.hash.digest() ).decode()
-        # self.hash.update(str(urandom.random()))
-        # seed += ubinascii.hexlify( self.hash.digest() ).decode()
-        # print(len(seed), seed)
-        seed="TheQuickBrownFoxesJumpOverTheLazyDogs.TheQuickBrownFoxesJumpOverTheLazyDogs.TheQuickBrownFoxesJumpOverTheLazyDogs.TheQuickBrownFoxesJumpOverTheLazyDogs.TheQuickBrownFoxesJumpOverTheLazyDogs.TheQuickBrownFoxesJumpOverTheLazyDogs."
-        for x in [150,200]:
-            n = 1
+        
+        for x in [5,50,100,150,200,250,300]: #encode(payload + header) = pkt_size 
+            n = 35
             while n > 0:
-                payload = str(seed[0:x])
+                payload = "Q"+str(x)
                 self.ping.sended_at = time.ticks_ms()
                 self.ping.received_at = None 
+                self.ping.pkt_size = -1
+                self.ping.payload_size = -1
                 self.fwd.sendInterest(self.ping.fid , self.ping.get_name(), payload)
-                timeout = 5
+                timeout = 10
                 while timeout>0:
                     print(timeout,'.',end=' ')
-                    print('')
                     if self.ping.received_at:
                         break
                     time.sleep(1)
                     timeout=timeout-1
                 n_size = len(self.ping.get_name())
-                pl_size = len(payload) if len(payload) else -1
+                pl_size = self.ping.payload_size if self.ping.payload_size else -1
                 pkt_size = self.ping.pkt_size if self.ping.pkt_size else -1
                 self.exp.write_n_close('ping',n, self.ping.sended_at, self.ping.received_at,n_size, pl_size,pkt_size)
-                
+                print('')
                 n=n-1
                 time.sleep(1)
         print("======================GOODLUCK======================")

@@ -57,13 +57,13 @@ class LoRa(object):
             for i in range( c ):
                 frag = payload[i*size:(i+1)*size]
                 hexlify = self.ndn.encode(_type,c,i,name,frag)
-                print("frag:",_type,c,i,name,frag)
+                #print("frag:",_type,c,i,name,frag)
                 #print("frag_hex(",len(hexlify),"):",hexlify)
                 self.lora.println(hexlify, implicit_header=False)
                 time.sleep(0.5)
         else:
             hexlify = self.ndn.encode(_type,1,0,name,payload)
-            print("No frag:",name,payload,len(hexlify))
+            #print("No frag:",name,payload,len(hexlify))
             self.lora.println(hexlify, implicit_header=False)
         self.on_send = False
         
@@ -90,14 +90,15 @@ class LoRa(object):
                 self.buffer[name] = payload
             return
 
-        pkt_size=len(payload)
+        #pkt_size=len(payload)
+        
         if (f_count-1) == f_index: #last frag or no frag 
             if name in self.buffer:
                 payload = self.buffer[name] + payload
-                pkt_size = 14+(len(name)*2)+(len(payload)*2)
                 self.buffer.pop(name)
 
         #print("full_pl:",pkt_size,payload)
+        pkt_size = 14+(len(name)*2)+(len(payload)*2)
 
         #print("lora.decoded=>",pkt_type, f_count, f_index, p_len, n_len, pkt_size, name, payload)
         if pkt_type  == Ndn.INTEREST:

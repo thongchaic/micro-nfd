@@ -45,7 +45,7 @@ class Forwarder(object):
         self.pit.satisfied(name)
 
     def onRecievedInterest(self,in_face, p_len, n_len, pkt_size, name, payload):
-        print("onRecievedInterest=>",in_face, p_len, n_len, pkt_size, name, payload)
+        #print("onRecievedInterest=>",in_face, p_len, n_len, pkt_size, name, payload)
 
         if name is None: #Unsolicited 
             return
@@ -61,11 +61,13 @@ class Forwarder(object):
         if not self.routes.match(name):
             self.nack(in_face,name,'no routes')
             return
-            
+        
+        #exact match + broadcast strategy 
+
         self.i_buffer.append( (in_face,name,payload) )
 
     def onReceivedData(self,in_face, p_len, n_len, pkt_size, name, payload):
-        print("onReceivedData=>",in_face, p_len, n_len, pkt_size, name, payload)
+        #print("onReceivedData=>",in_face, p_len, n_len, pkt_size, name, payload)
         if self.pit.in_pit(name):
             self.d_buffer.append( (in_face, name, payload,pkt_size) )
         
@@ -74,7 +76,7 @@ class Forwarder(object):
         if len(fids)>0:
             self.pit.satisfied(name)
             for fid in fids:
-                print("sendData:",in_face, fid, name, payload)
+                #print("sendData:",in_face, fid, name, payload)
                 out_face = self.table.get(fid)
                 out_face.send(Ndn.DATA, name, payload,pkt_size)
 
@@ -84,7 +86,7 @@ class Forwarder(object):
             self.pit.add(in_face, name)
         for fid in fids:
             if in_face != fid:
-                print("sendInterest:",in_face, fid, name, interest)
+                #print("sendInterest:",in_face, fid, name, interest)
                 out_face = self.table.get(fid)
                 out_face.send(Ndn.INTEREST, name, interest)
 
@@ -92,7 +94,7 @@ class Forwarder(object):
         if name is None: #Unsolicited 
             return
             
-        print("JoinInterest=>",in_face, p_len, n_len, pkt_size, name, payload)
+        #print("JoinInterest=>",in_face, p_len, n_len, pkt_size, name, payload)
         accepted = True 
 
         if accepted:
@@ -103,7 +105,7 @@ class Forwarder(object):
     def onReceivedJoinData(self,fid, p_len, n_len, pkt_size, name, payload):
         #store EKEY 
         self.accepted=True 
-        print("Accetped : ", payload, len(payload), pkt_size)
+        #print("Accetped : ", payload, len(payload), pkt_size)
         #app_config['EKEY'] = payload
         self.stop = time.ticks_ms()
         self.pkt_size = pkt_size
@@ -116,13 +118,13 @@ class Forwarder(object):
         for fid in fids:
             out_face = self.table.get(fid)
             if out_face:
-                print("sendJoinInterest=>",name,interest)
+                #print("sendJoinInterest=>",name,interest)
                 out_face.send(Ndn.JOIN_INTEREST, name, interest)
 
     def sendJoinData(self, fid, name, data):
         out_face = self.table.get(fid)
         if out_face:
-            print("sendJoinData=>",name,data)
+            #print("sendJoinData=>",name,data)
             out_face.send(Ndn.JOIN_DATA, name, data)
 
     def nack(self,fid, name, reason):
