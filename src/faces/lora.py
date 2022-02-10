@@ -41,29 +41,22 @@ class LoRa(object):
     def terminate(self):
         self.stop = True 
 
-    def send(self,_type, name, payload,opt=None):
+    def send(self,_type, name, payload):
        
         if len(payload)<=0:
             return
         self.on_send = True
-
         pkt_len = 14+(len(name)*2)+(len(payload)*2)
-        #print("pkt_len:",pkt_len)
         if pkt_len>Ndn.MAX_PKT_LENGTH:
-            #fullhex = self.ndn.encode(_type,1,0,name,payload)
-            #print("full_pkt(",len(fullhex),",",len(payload),"):",payload)
             c = int(math.ceil(pkt_len/Ndn.MAX_PKT_LENGTH))
             size = int(len(payload)/c)+1
             for i in range( c ):
                 frag = payload[i*size:(i+1)*size]
                 hexlify = self.ndn.encode(_type,c,i,name,frag)
-                #print("frag:",_type,c,i,name,frag)
-                #print("frag_hex(",len(hexlify),"):",hexlify)
                 self.lora.println(hexlify, implicit_header=False)
                 time.sleep(0.5)
         else:
             hexlify = self.ndn.encode(_type,1,0,name,payload)
-            #print("No frag:",name,payload,len(hexlify))
             self.lora.println(hexlify, implicit_header=False)
         self.on_send = False
         
@@ -75,32 +68,30 @@ class LoRa(object):
         payload = self.lora.read_payload()
         if payload is None or len(payload) < 14:
             return
-        #print("raw:",payload)
 
         pkt_type, f_count, f_index, p_len, n_len, chksum, name, payload = self.ndn.decode(payload)
-        #print(pkt_type, f_count, f_index, p_len, n_len, chksum,name,payload)
         
         if pkt_type is None:
             return 
 
         if (f_count-1) != f_index: #more frag
             if name in self.buffer:
-                self.buffer[name] = self.buffer[name] + payload
+                self.buffer[name].append([f_index,payload])# = self.buffer[name] + payload
             else:
-                self.buffer[name] = payload
+                self.buffer[name] = [f_index,payload]
             return
-
-        #pkt_size=len(payload)
         
         if (f_count-1) == f_index: #last frag or no frag 
             if name in self.buffer:
-                payload = self.buffer[name] + payload
+                #payload = self.buffer[name] + payload
+                self.buffer[name].sort()
+                _payload = ''
+                for p in enumerate(self.buffer[name]):
+                    
                 self.buffer.pop(name)
 
-        #print("full_pl:",pkt_size,payload)
         pkt_size = 14+(len(name)*2)+(len(payload)*2)
 
-        #print("lora.decoded=>",pkt_type, f_count, f_index, p_len, n_len, pkt_size, name, payload)
         if pkt_type  == Ndn.INTEREST:
             if self.onRecievedInterest:
                 self.onRecievedInterest(self.fid, p_len, n_len, pkt_size, name, payload)

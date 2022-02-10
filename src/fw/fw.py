@@ -15,19 +15,16 @@ class Forwarder(object):
     def __init__(self,uuid, device_config, lora_parameters, app_config):
         print("init...Forwarder....")
         self.stop = None 
-        self.pkt_size = 0
-        self.payload_size = 0
         self.UUID=uuid 
         self.table = FaceTable()
         self.routes = Routes()
         self.pit = Pit()
         self.accepted = False
+
         self.lora = LoRa(1, device_config, lora_parameters)
-        # self.lora.onRecievedInterest = self.onRecievedInterest
-        # self.lora.onReceivedData = self.onReceivedData
         self.lora.onReceivedJoinInterest = self.onReceivedJoinInterest
         self.lora.onReceivedJoinData = self.onReceivedJoinData
-        self.addFaceTable(1, self.lora)
+        self.addFaceTable(self.lora.fid, self.lora)
 
         self.i_buffer = [] #fix maximum recursion depth exceeded
         self.d_buffer = [] #fix maximum recursion depth exceeded
@@ -45,8 +42,6 @@ class Forwarder(object):
         self.pit.satisfied(name)
 
     def onRecievedInterest(self,in_face, p_len, n_len, pkt_size, name, payload):
-        #print("onRecievedInterest=>",in_face, p_len, n_len, pkt_size, name, payload)
-
         if name is None: #Unsolicited 
             return
         
@@ -67,18 +62,16 @@ class Forwarder(object):
         self.i_buffer.append( (in_face,name,payload) )
 
     def onReceivedData(self,in_face, p_len, n_len, pkt_size, name, payload):
-        #print("onReceivedData=>",in_face, p_len, n_len, pkt_size, name, payload)
         if self.pit.in_pit(name):
-            self.d_buffer.append( (in_face, name, payload,pkt_size) )
+            self.d_buffer.append( (in_face, name, payload) )
         
-    def sendData(self, in_face, name, payload,pkt_size):
+    def sendData(self, in_face, name, payload):
         fids = self.pit.get(name)
         if len(fids)>0:
             self.pit.satisfied(name)
             for fid in fids:
-                #print("sendData:",in_face, fid, name, payload)
                 out_face = self.table.get(fid)
-                out_face.send(Ndn.DATA, name, payload,pkt_size)
+                out_face.send(Ndn.DATA, name, payload)
 
     def sendInterest(self,in_face, name, interest):
         fids = self.routes.get(name) 
@@ -94,7 +87,6 @@ class Forwarder(object):
         if name is None: #Unsolicited 
             return
             
-        #print("JoinInterest=>",in_face, p_len, n_len, pkt_size, name, payload)
         accepted = True 
 
         if accepted:
@@ -105,12 +97,7 @@ class Forwarder(object):
     def onReceivedJoinData(self,fid, p_len, n_len, pkt_size, name, payload):
         #store EKEY 
         self.accepted=True 
-        #print("Accetped : ", payload, len(payload), pkt_size)
-        #app_config['EKEY'] = payload
         self.stop = time.ticks_ms()
-        self.pkt_size = pkt_size
-        self.payload_size = len(payload)
-
 
     def sendJoinInterest(self, name, interest):
         fids = self.routes.get(name) 
@@ -136,6 +123,7 @@ class Forwarder(object):
         pass
     
     def daemon(self): #fix maximum recursion depth exceeded
+        
         while True:
             if self.lora:
                 self.lora.receive()
@@ -144,4 +132,7 @@ class Forwarder(object):
                 self.sendInterest( i[0], i[1], i[2] )
             if self.d_buffer:
                 d = self.d_buffer.pop(0)
-                self.sendData( d[0],d[1],d[2],d[3] )
+                self.sendData( d[0],d[1],d[2] )
+            
+            if self.pit:
+                self.pit.daemon()

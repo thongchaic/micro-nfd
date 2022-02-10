@@ -78,16 +78,16 @@ __DEBUG__ = False
 class SX127x:
 
     default_parameters = {
-            'frequency': 9232E6, 
-            'tx_power_level': 14, 
-            'signal_bandwidth': 125E3,    
-            'spreading_factor': 7, 
-            'coding_rate': 4, 
-            'preamble_length': 8,
-            'implicit_header': False, 
-            'sync_word': 0x12, 
-            'enable_CRC': False,
-            'invert_IQ': False,
+                'frequency': 9232E6, 
+                'tx_power_level': 14, 
+                'signal_bandwidth': 125E3,    
+                'spreading_factor': 7, 
+                'coding_rate': 4, 
+                'preamble_length': 8,
+                'implicit_header': False, 
+                'sync_word': 0x12, 
+                'enable_CRC': False,
+                'invert_IQ': False,
             }
 
     # frfs = {169E6: (42, 64, 0),
@@ -132,8 +132,8 @@ class SX127x:
             self._pin_rx_done = Pin(self._pins["dio_0"], Pin.IN)
         if "ss" in self._pins:
             self._pin_ss = Pin(self._pins["ss"], Pin.OUT)
-        if "led" in self._pins:
-            self._led_status = Pin(self._pins["led"], Pin.OUT)
+        # if "led" in self._pins:
+        #     self._led_status = Pin(self._pins["led"], Pin.OUT)
 
         # check hardware version
         init_try = True
@@ -516,15 +516,15 @@ class SX127x:
 
         return response
 
-    def blink_led(self, times = 1, on_seconds = 0.1, off_seconds = 0.1):
-        for i in range(times):
-            if self._led_status:
-                self._led_status.value(True)
-                sleep(on_seconds)
-                self._led_status.value(False)
-                sleep(off_seconds)
+    # def blink_led(self, times = 1, on_seconds = 0.1, off_seconds = 0.1):
+    #     for i in range(times):
+    #         if self._led_status:
+    #             self._led_status.value(True)
+    #             sleep(on_seconds)
+    #             self._led_status.value(False)
+    #             sleep(off_seconds)
 
     def collect_garbage(self):
         gc.collect()
-        if __DEBUG__:
-            print('[Memory - free: {}   allocated: {}]'.format(gc.mem_free(), gc.mem_alloc()))
+        # if __DEBUG__:
+        #     print('[Memory - free: {}   allocated: {}]'.format(gc.mem_free(), gc.mem_alloc()))

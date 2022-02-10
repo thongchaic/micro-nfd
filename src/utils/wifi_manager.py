@@ -8,6 +8,9 @@ import esp
 class WifiManager(object):
     def __init__(self,wifi_config):
         print(wifi_config)
+        if wifi_config['ssid'] is None:
+            return 
+            
         self.ssid = wifi_config['ssid']
         self.pwd = wifi_config['password']
         self.ip = None 
@@ -28,6 +31,9 @@ class WifiManager(object):
         if self.ip is None:
             return None
         return self.ip[3]
+    
+    def is_connect(self):
+        return wlan.isconnected()
 
     def do_connect(self):
         wlan = network.WLAN(network.STA_IF)

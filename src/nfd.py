@@ -16,7 +16,8 @@ from config import *
 from experiments import ExperimentalData
 from ping import PingApp
 from fw import Forwarder
-import gc 
+import gc
+
 class MicroNFD(object):
     # 1 Gw
     # 0 Sensor
@@ -32,7 +33,6 @@ class MicroNFD(object):
         self.ping = PingApp(2, "/alice/ping")
         self.fwd.addFaceTable(self.ping.fid, self.ping)
         
-
     def joinInterst(self):
         #NDN-LPWAN JoinInterest Procedure 
         nonce = str(urandom.random())
