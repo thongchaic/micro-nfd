@@ -28,7 +28,7 @@ class LoRa(object):
             print(i,'.',end=' ')
             time.sleep(1)
             i = i-1
-
+        
         self.lora = SX127x(device_spi, pins=device_config, parameters=lora_parameters)
         self.fid = fid
         self.stop = False 
@@ -62,9 +62,11 @@ class LoRa(object):
         
     def receive(self):
         if self.on_send:
-            return 
+            return
+
         if not self.lora.received_packet():
             return 
+
         payload = self.lora.read_payload()
         if payload is None or len(payload) < 14:
             return
@@ -84,10 +86,14 @@ class LoRa(object):
         if (f_count-1) == f_index: #last frag or no frag 
             if name in self.buffer:
                 #payload = self.buffer[name] + payload
+                if len(self.buffer[name]) != f_count: #missed some fragments 
+                    self.buffer.pop(name)
+                    return
                 self.buffer[name].sort()
                 _payload = ''
                 for p in enumerate(self.buffer[name]):
-                    
+                    _payload += p
+                payload = _payload+payload
                 self.buffer.pop(name)
 
         pkt_size = 14+(len(name)*2)+(len(payload)*2)
@@ -104,19 +110,3 @@ class LoRa(object):
         elif pkt_type == Ndn.JOIN_DATA:
             if self.onReceivedJoinData:
                 self.onReceivedJoinData(self.fid, p_len, n_len, pkt_size, name, payload)
-
-    # def daemon(self):
-    #     if self.on_send:
-    #         return 
-    #     payload=None
-    #     if self.lora.received_packet():
-    #         payload = self.lora.read_payload()
-    #         if payload is None or len(payload) < 14:
-    #             return
-    #         print("raw:",payload)
-    #         pkt_type, f_count, f_index, p_len, n_len, chksum, name, payload = self.ndn.decode(payload)
-    #         if pkt_type is None:
-    #             return 
-    #         print("lora.decoded=>",pkt_type, f_count, f_index, p_len, n_len, chksum, name, payload)
-
-    #         #self.receive(payload)

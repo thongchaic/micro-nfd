@@ -16,6 +16,7 @@ class RESTFul:
 
     def receive(self):
         #Data pkt received 
+        pass 
 
     def get(self,params): #paprams format: x=1&y=2.5
         rst = requests.get(self.URI+"?"+params)

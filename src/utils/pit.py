@@ -6,8 +6,7 @@ class Pit:
         self.pit = {}
         self.ticks_sec = time.ticks_ms()
         self.pit_timeout = pit_timeout
-
-    
+        
     def add(self, fid, name):
         if name in self.pit:
             if fid not in self.pit[name]:
@@ -30,13 +29,8 @@ class Pit:
             self.pit.pop(name)
             return True 
         return False 
-    def pit_timeout(self):
-        pass 
     def daemon(self):
-        #check timeout 
-        if (time.ticks_ms()-self.ticks_sec) > self.pit_timeout:
-            self.pit_timeout()
-            self.ticks_sec = time.ticks_ms()
+        pass 
 
     
 

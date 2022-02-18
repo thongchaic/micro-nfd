@@ -9,7 +9,6 @@ class Ndn:
     JOIN_DATA = 8
     JOIN_REJECTED = 9 
 
-
     def __init__(self):
         print("Init...NDN....")
      

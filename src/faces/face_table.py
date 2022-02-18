@@ -1,5 +1,4 @@
 # import utime 
-import _thread
 class FaceTable:
 
     def __init__(self):        

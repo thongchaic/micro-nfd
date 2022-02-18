@@ -123,7 +123,7 @@ class Forwarder(object):
         pass
     
     def daemon(self): #fix maximum recursion depth exceeded
-        
+        interval = time.ticks_ms()
         while True:
             if self.lora:
                 self.lora.receive()
@@ -134,5 +134,8 @@ class Forwarder(object):
                 d = self.d_buffer.pop(0)
                 self.sendData( d[0],d[1],d[2] )
             
-            if self.pit:
-                self.pit.daemon()
+            #sec interval 
+            if (time.ticks_ms()-interval) > 20000:
+                if self.pit:
+                    self.pit.daemon()
+                interval = time.ticks_ms()

@@ -81,9 +81,9 @@ class MicroNFD(object):
             payload_size=self.fwd.payload_size
             pkt_size=self.fwd.pkt_size
             if self.fwd.stop:
-                stop = self.fwd.stop
+                stop = self.ping.stop
 
-            self.exp.write_n_close("bootstrap",n,start,stop,n_size,payload_size,pkt_size)
+            self.exp.write_n_close("bootstrap",n,self.ping.start,stop,n_size,payload_size,pkt_size)
             print('')
             n = n - 1
             time.sleep(1)
