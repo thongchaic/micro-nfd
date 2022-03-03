@@ -16,5 +16,3 @@ import network
 from nfd import MicroNFD
 
 nfd = MicroNFD()
-nfd.gateway()
-

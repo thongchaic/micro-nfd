@@ -89,17 +89,17 @@ class LoRa(object):
                 payload = _payload+payload
                 self.buffer.pop(name)
 
-        pkt_size = 14+(len(name)*2)+(len(payload)*2)
+        #pkt_size = 14+(len(name)*2)+(len(payload)*2)
 
         if pkt_type  == Ndn.INTEREST:
             if self.onRecievedInterest:
-                self.onRecievedInterest(self.fid, p_len, n_len, pkt_size, name, payload)
+                self.onRecievedInterest(self.fid, p_len, n_len, name, payload)
         elif pkt_type == Ndn.DATA:
             if self.onReceivedData:
-                self.onReceivedData(self.fid, p_len, n_len, pkt_size, name, payload)
+                self.onReceivedData(self.fid, p_len, n_len, name, payload)
         elif pkt_type == Ndn.JOIN_INTEREST:
             if self.onReceivedJoinInterest:
-                self.onReceivedJoinInterest(self.fid, p_len, n_len, pkt_size, name, payload)
+                self.onReceivedJoinInterest(self.fid, p_len, n_len, name, payload)
         elif pkt_type == Ndn.JOIN_DATA:
             if self.onReceivedJoinData:
-                self.onReceivedJoinData(self.fid, p_len, n_len, pkt_size, name, payload)
+                self.onReceivedJoinData(self.fid, p_len, n_len, name, payload)

@@ -41,7 +41,7 @@ class Forwarder(object):
     def forceSatisfied(self, name):
         self.pit.satisfied(name)
 
-    def onRecievedInterest(self,in_face, p_len, n_len, pkt_size, name, payload):
+    def onRecievedInterest(self,in_face, p_len, n_len, name, payload):
         if name is None: #Unsolicited 
             return
         
@@ -61,7 +61,7 @@ class Forwarder(object):
 
         self.i_buffer.append( (in_face,name,payload) )
 
-    def onReceivedData(self,in_face, p_len, n_len, pkt_size, name, payload):
+    def onReceivedData(self,in_face, p_len, n_len, name, payload):
         if self.pit.in_pit(name):
             self.d_buffer.append( (in_face, name, payload) )
         
@@ -83,7 +83,7 @@ class Forwarder(object):
                 out_face = self.table.get(fid)
                 out_face.send(Ndn.INTEREST, name, interest)
 
-    def onReceivedJoinInterest(self,in_face, p_len, n_len, pkt_size, name, payload):
+    def onReceivedJoinInterest(self,in_face, p_len, n_len, name, payload):
         if name is None: #Unsolicited 
             return
             
@@ -94,7 +94,7 @@ class Forwarder(object):
         else:
             self.nack(in_face,name,"rejected") 
     
-    def onReceivedJoinData(self,fid, p_len, n_len, pkt_size, name, payload):
+    def onReceivedJoinData(self,fid, p_len, n_len, name, payload):
         #store EKEY 
         self.accepted=True 
         self.stop = time.ticks_ms()

@@ -13,7 +13,7 @@ import machine
 import uhashlib
 # from wifi_manager import WifiManager
 from config import * 
-from experiments import ExperimentalData
+#from experiments import ExperimentalData
 from ping import PingApp
 from fw import Forwarder
 import gc
@@ -29,11 +29,21 @@ class MicroNFD(object):
         self.UUID = ubinascii.hexlify( machine.unique_id() ).decode()
         gc.enable()
         self.hash=uhashlib.sha256()
+
+        self.mode = app_config['mode']
         
-        self.exp = ExperimentalData("data.csv")
+        #self.exp = ExperimentalData("data.csv")
         self.fwd = Forwarder(self.UUID, device_config, lora_parameters, app_config)
+
+        #bootstrap app 
+        self.boot = NDNBootstrap(3,app_config)
+        self.fwd.addFaceTable(self.boot.fid, self.boot)
        
         #ping app 
         self.ping = PingApp(2, "/alice/ping")
         self.fwd.addFaceTable(self.ping.fid, self.ping)
-        
+
+    def gateway(self):
+        pass 
+    def mote(self):
+        pass 
