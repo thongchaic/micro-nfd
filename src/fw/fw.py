@@ -33,6 +33,7 @@ class Forwarder(object):
 
     def addRoute(self,fid,name):
         self.routes.add(fid,name)
+
     def addFaceTable(self, fid, obj):
         self.table.add(fid, obj)
         obj.onRecievedInterest = self.onRecievedInterest
@@ -56,7 +57,6 @@ class Forwarder(object):
         if not self.routes.match(name):
             self.nack(in_face,name,'no routes')
             return
-        
         #exact match + broadcast strategy 
 
         self.i_buffer.append( (in_face,name,payload) )
@@ -135,7 +135,9 @@ class Forwarder(object):
                 self.sendData( d[0],d[1],d[2] )
             
             #sec interval 
-            if (time.ticks_ms()-interval) > 20000:
+            if (time.ticks_ms()-interval) > 30000:
                 if self.pit:
                     self.pit.daemon()
                 interval = time.ticks_ms()
+        
+        
