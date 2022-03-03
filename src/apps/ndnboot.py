@@ -1,10 +1,9 @@
 
 from ndn import Ndn 
-class BootStrap:
-    def __inti__(self):
-        pass 
-    def onJoinInterest(self):
-        pass 
+class NDNBootstrap:
+    def __inti__(self, app_config):
+        self.app_config = app_config
+
     def send(self,_type,name,payload):
         if _type == Ndn.JOIN_INTEREST:
             pass #Incoming Join Interest 

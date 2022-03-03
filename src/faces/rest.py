@@ -6,11 +6,13 @@ class RESTFul:
         self.onRecievedInterest = None
         self.onReceivedData = None  
 
-    
     def send(self,_type,name,payload):
         if _type == Ndn.DATA:
             self.receive(_type,name,payload)
             return 
+        if _type == Ndn.INTEREST:
+            #process and 
+
         #Interest pkt received 
         
 
@@ -28,6 +30,8 @@ class RESTFul:
         pass
     def delete(self, id):
         pass
+    def json(self, data):
+        pass 
     
 
     

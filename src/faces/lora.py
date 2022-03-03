@@ -23,7 +23,7 @@ class LoRa(object):
         mosi = Pin(device_config['mosi'], Pin.OUT, Pin.PULL_UP),
         miso = Pin(device_config['miso'], Pin.IN, Pin.PULL_UP))
 
-        i=3
+        i=5
         while i > 0:
             print(i,'.',end=' ')
             time.sleep(1)
@@ -31,15 +31,8 @@ class LoRa(object):
         
         self.lora = SX127x(device_spi, pins=device_config, parameters=lora_parameters)
         self.fid = fid
-        self.stop = False 
         self.on_send = False
-        time.sleep(1)
         
-    def face_id(self):
-        return self.fid 
-    
-    def terminate(self):
-        self.stop = True 
 
     def send(self,_type, name, payload):
        
@@ -47,7 +40,7 @@ class LoRa(object):
             return
         self.on_send = True
         pkt_len = 14+(len(name)*2)+(len(payload)*2)
-        if pkt_len>Ndn.MAX_PKT_LENGTH:
+        if pkt_len>Ndn.MAX_PKT_LENGTH: #Do fragmentation 
             c = int(math.ceil(pkt_len/Ndn.MAX_PKT_LENGTH))
             size = int(len(payload)/c)+1
             for i in range( c ):

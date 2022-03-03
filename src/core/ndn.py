@@ -1,7 +1,7 @@
 import binascii
 
 class Ndn:
-    MAX_PKT_LENGTH=255 #defined by the sx127x.py library, so much like MTU  
+    MAX_PKT_LENGTH=255 #defined by the sx127x.py library, so much like MTU/MRU  
     INTEREST = 4
     DATA = 5
     NACK = 6 

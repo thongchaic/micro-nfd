@@ -23,7 +23,7 @@ class PingApp:
         #Process ping ==> 
         if _type == Ndn.INTEREST:
             #self.sended_at = time.ticks_ms()
-            payload = str(self.sended_at)
+            payload = str(self.sended_at) #add payload 
             #Response interest packets 
             self.onReceivedData(self.fid, p_len, n_len, chksum, name, payload)
         elif _type == Ndn.DATA:
