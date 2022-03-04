@@ -8,12 +8,11 @@ class Crypt:
         self.key = key
         self.sha1 = sha1()
     
-    def update(self,key='16-bytes-key-aes'):
+    def update(self,key='16-bytes-aes-key'):
         if len(key) != 16: #Use 16-byte key 
             raise Exception('AES 64-bit key required!')
         if not isinstance(key,(bytes)):
             key = bytes(key,'ascci')
-
         return aes(key, 1) #ECB Mode 
 
     def encrypt(self,plaintext):
@@ -33,4 +32,10 @@ class Crypt:
     def hashCheck(self,hash1, data):
         hash2 = self.hash(data)
         return hash1 == hash2 
+
+    def cert(self,_file):
+        pass
+        
+    def sign(self):
+        pass 
     

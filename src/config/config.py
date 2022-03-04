@@ -35,7 +35,7 @@ lora_parameters = {
 app_config = {
     'mode'      : 0,  # 0 = Gateway,  1 = Mote 
     'owner_id'  : 'thongchai',
-    'EKEY'      : '0afd80709' 
+    'EKEY'      : '16-bytes-aes-key' 
 }
 
 wifi_config = {

@@ -28,7 +28,7 @@ class PingApp:
             #self.sended_at = time.ticks_ms()
             payload = self.crypt.encrypt( str(self.sended_at) ) #add payload 
             #Response interest packets 
-            self.onReceivedData(self.fid, p_len, n_len, chksum, name, payload)
+            self.onReceivedData(self.fid, p_len, n_len, name, payload)
         elif _type == Ndn.DATA:
             #Data packet received 
             self.received_at = time.ticks_ms()

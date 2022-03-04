@@ -1,5 +1,6 @@
 
-from ndn import Ndn 
+from ndn import Ndn
+import json 
 class NDNBootstrap:
     def __inti__(self, fid, app_config):
         self.app_config = app_config
@@ -11,4 +12,5 @@ class NDNBootstrap:
         if _type == Ndn.JOIN_INTEREST:
             pass #Incoming Join Interest 
         elif _type == Ndn.JOIN_DATA:
-            pass #returned join data 
+            data = json.load(payload)
+            self.app_config['EKEY'] = data['EKEY']

@@ -42,7 +42,16 @@ class Ndn:
         #x = 0xFF
         #y = 0xFF
         #chksum = binascii.hexlify( chr(x)+chr(y) )
-        return b'ffff'
+        # crc = binascii.crc32(data)
+        # a = crc & 0x000000FF
+        # b = crc & 0x0000FF00
+        # b >>= 8 
+        # c = crc & 0x00FF0000
+        # c >>= 16
+        # d = crc & 0xFF000000
+        # d >= 24 
+        crc = binascii.crc_hqx(data,0)
+        return crc[2:] #without 0x.. 
 
     def encode(self,_type,c,i,name,payload):
         #Header + Payload 

@@ -1,8 +1,9 @@
 import requests 
 from ndn import Ndn 
 class RESTFul:
-    def __init__(self, uri):
+    def __init__(self, fid, uri):
         self.URI = uri
+        self.fid = fid 
         self.onRecievedInterest = None
         self.onReceivedData = None  
 
@@ -12,10 +13,10 @@ class RESTFul:
             return 
         if _type == Ndn.INTEREST:
             #process and 
+            pass 
 
         #Interest pkt received 
         
-
     def receive(self):
         #Data pkt received 
         pass 
@@ -24,12 +25,15 @@ class RESTFul:
         rst = requests.get(self.URI+"?"+params)
         return rst 
 
-    def post(self):
-        pass
+    def post(self,path,data):
+        rst = requests.post(self.URI+path,data)
+        return rst 
+
     def put(self):
         pass
     def delete(self, id):
-        pass
+        rst = requests.delete(self.URI+"/"+id)
+        return rst 
     def json(self, data):
         pass 
     
