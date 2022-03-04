@@ -7,7 +7,6 @@ class NDNBootstrap:
         self.onReceivedJoinInterest = None 
         self.onReceivedJoinData = None 
 
-
     def send(self,_type,name,payload):
         if _type == Ndn.JOIN_INTEREST:
             pass #Incoming Join Interest 

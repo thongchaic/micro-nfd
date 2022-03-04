@@ -1,13 +1,16 @@
 from ndn import Ndn 
 import time 
+from crypt import Crypt
 class PingApp:
-    def __init__(self,fid, name):
+    def __init__(self,fid, name, EKEY):
         self.fid = fid
         self.name = name 
+        self.crypt = Crypt(EKEY)
         self.sended_at = None
         self.received_at = None 
         self.onRecievedInterest = None
         self.onReceivedData = None  
+
 
     def get_name(self):
         return self.name
@@ -23,11 +26,12 @@ class PingApp:
         #Process ping ==> 
         if _type == Ndn.INTEREST:
             #self.sended_at = time.ticks_ms()
-            payload = str(self.sended_at) #add payload 
+            payload = self.crypt.encrypt( str(self.sended_at) ) #add payload 
             #Response interest packets 
             self.onReceivedData(self.fid, p_len, n_len, chksum, name, payload)
         elif _type == Ndn.DATA:
             #Data packet received 
             self.received_at = time.ticks_ms()
-            print(self.sended_at, self.received_at, payload, sep=",")
+            data = self.crypt.decrypt(payload)
+            print(self.sended_at, self.received_at, data, sep=",")
     
