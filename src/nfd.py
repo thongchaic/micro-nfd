@@ -21,10 +21,8 @@ import gc
 from ping import PingApp
 from ndnboot import NDNBootstrap
 
-
 class MicroNFD(object):
-    # 1 Gw
-    # 0 Sensor
+
     def __init__(self):
         self.UUID = ubinascii.hexlify( machine.unique_id() ).decode()
         gc.enable()
@@ -35,6 +33,9 @@ class MicroNFD(object):
         #self.exp = ExperimentalData("data.csv")
         self.fwd = Forwarder(self.UUID, device_config, lora_parameters, app_config)
 
+
+
+    def mote(self):
         #bootstrap app 
         self.boot = NDNBootstrap(3,app_config)
         self.fwd.addFaceTable(self.boot.fid, self.boot)
@@ -43,7 +44,9 @@ class MicroNFD(object):
         self.ping = PingApp(2, "/alice/ping")
         self.fwd.addFaceTable(self.ping.fid, self.ping)
 
-    def gateway(self):
-        pass 
-    def mote(self):
+        # while True:
+        #     #app interval 
+        #     time.sleep(60)
+    
+    def deepsleep(self):
         pass 

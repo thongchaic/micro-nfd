@@ -10,7 +10,8 @@ class PM25DustMonitoring: #PMS3003
 
         self.pms = machine.UART(2,9600)
         self.pms.init(9600,bits=8,parity=None,stop=1)
-       
+        
+
     def send(self,_type,name,payload):
         if _type == Ndn.INTEREST:
             #process 
@@ -21,11 +22,10 @@ class PM25DustMonitoring: #PMS3003
             p_len = len(payload)
             n_len = len(name)
 
-            if self.onReceivedData(self.fid, p_len, n_len, name, payload)
-        
-        self.receive(_type,name,payload)
+            if self.onReceivedData: #return NDN Data  
+                self.onReceivedData(self.fid, p_len, n_len, name, payload)
 
-    def receive(self):
+    def receive(self,_type,name,payload):
         pass
 
     def calc_pms(self,x,y):

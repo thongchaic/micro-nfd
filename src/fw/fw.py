@@ -79,7 +79,6 @@ class Forwarder(object):
             self.pit.add(in_face, name)
         for fid in fids:
             if in_face != fid:
-                #print("sendInterest:",in_face, fid, name, interest)
                 out_face = self.table.get(fid)
                 out_face.send(Ndn.INTEREST, name, interest)
 
@@ -114,7 +113,7 @@ class Forwarder(object):
             #print("sendJoinData=>",name,data)
             out_face.send(Ndn.JOIN_DATA, name, data)
 
-    def nack(self,fid, name, reason):
+    def nack(self,fid, name, reason): #timeout may be better 
         out_face = self.table.get(fid)
         if out_face:
             out_face.send(Ndn.NACK,name,reason)  
@@ -139,5 +138,4 @@ class Forwarder(object):
                 if self.pit:
                     self.pit.daemon()
                 interval = time.ticks_ms()
-        
         
