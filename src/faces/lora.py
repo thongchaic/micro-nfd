@@ -1,6 +1,6 @@
 #import _thread
 import time 
-from machine import Pin, SoftSPI, UART
+from machine import Pin, SoftSPI
 from sx127x import SX127x
 import math
 from ndn import Ndn
@@ -33,7 +33,6 @@ class LoRa(object):
         self.fid = fid
         self.on_send = False
         
-
     def send(self,_type, name, payload):
        
         if len(payload)<=0:

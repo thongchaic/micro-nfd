@@ -11,7 +11,6 @@ class PingApp:
         self.onRecievedInterest = None
         self.onReceivedData = None  
 
-
     def get_name(self):
         return self.name
 
