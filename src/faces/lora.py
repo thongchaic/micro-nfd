@@ -38,12 +38,16 @@ class LoRa(object):
         if len(payload)<=0:
             return
         self.on_send = True
+
+        #prefix = name[len(name)-10:]
+
         pkt_len = 14+(len(name)*2)+(len(payload)*2)
         if pkt_len>Ndn.MAX_PKT_LENGTH: #Do fragmentation 
             c = int(math.ceil(pkt_len/Ndn.MAX_PKT_LENGTH))
             size = int(len(payload)/c)+1
             for i in range( c ):
                 frag = payload[i*size:(i+1)*size]
+                
                 hexlify = self.ndn.encode(_type,c,i,name,frag)
                 self.lora.println(hexlify, implicit_header=False)
                 time.sleep(0.5)
@@ -67,6 +71,12 @@ class LoRa(object):
         
         if pkt_type is None:
             return 
+
+        #suffix = name
+        #for sfx in self.buffer.keys():
+        #   if sfx in name:
+        #       name = sfx 
+        #       break 
 
         if (f_count-1) != f_index: #more frag
             if name in self.buffer:
