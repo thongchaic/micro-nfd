@@ -32,12 +32,17 @@ class WifiManager(object):
             return None
         return self.ip[3]
     
-    def is_connect(self):
+    def is_connected(self):
         return wlan.isconnected()
+
+    def reconnect(self):
+        self.do_connect()
 
     def do_connect(self):
         wlan = network.WLAN(network.STA_IF)
         wlan.active(True)
+
+        timeout = 120 #seconds 
 
         if wlan.isconnected():
             self.ip = wlan.ifconfig()

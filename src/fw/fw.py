@@ -9,6 +9,7 @@ from face_table import FaceTable
 from routes import Routes
 from pit import Pit
 from ndn import Ndn
+#from mqtt import MQTTx
 #from cs import CS
 
 class Forwarder(object):
@@ -25,6 +26,9 @@ class Forwarder(object):
         self.lora.onReceivedJoinInterest = self.onReceivedJoinInterest
         self.lora.onReceivedJoinData = self.onReceivedJoinData
         self.addFaceTable(self.lora.fid, self.lora)
+
+
+        self.mqttx = None # MQTTx(mqtt_config)
 
         self.i_buffer = [] #fix maximum recursion depth exceeded
         self.d_buffer = [] #fix maximum recursion depth exceeded
@@ -132,6 +136,8 @@ class Forwarder(object):
             if self.d_buffer:
                 d = self.d_buffer.pop(0)
                 self.sendData( d[0],d[1],d[2] )
+            if self.mqttx:
+               self.mqttx.receive()
             
             #sec interval 
             if (time.ticks_ms()-interval) > 30000:

@@ -40,6 +40,18 @@ class Crypt:
         #+->* /ndn/th/ac/srru/tc/KEY/%C6%B4P%98%10%E3%BB%E3
         #+->* /ndn/th/ac/srru/tc/KEY/%C6%B4P%98%10%E3%BB%E3/self/v=1638519330038
         #ndnsec cert-dump 
+        # Certificate name:
+        # /ndn/th/ac/srru/tc/KEY/%C6%B4P%98%10%E3%BB%E3/self/v=1638519330038
+        # Validity:
+        # NotBefore: 19700101T000000
+        # NotAfter: 20411128T081530
+        # Public key bits:
+        # MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEtLvgsF0F9NEG2yNsS0BZsWYoUxL+
+        # Jl8wxQYyppHcDx07/gu0Rrtm8JiRv+kxQllGMo3IJBXDcAxZ0PH2AoS3iA==
+        # Signature Information:
+        # Signature Type: SignatureSha256WithEcdsa
+        # Key Locator: Self-Signed Name=/ndn/th/ac/srru/tc/KEY/%C6%B4P%98%10%E3%BB%E3
+
         #static
         C = """Bv0BQQc2CANuZG4IAnRoCAJhYwgEc3JydQgCdGMIA0tFWQgIxrRQmBDju+MIBHNl
                 bGY2CAAAAX1/XNT2FAkYAQIZBAA27oAVWzBZMBMGByqGSM49AgEGCCqGSM49AwEH
