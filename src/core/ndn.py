@@ -60,7 +60,7 @@ class Ndn:
             | t = 8-bit Types 
             | c = 4-bit Fragment Count 
             | i = 4-bit Fragment Index
-            | l = 16-bit Length     
+            | l = 8-bit Length     
             | lat (optional)
             | lng (optional)
         '''
@@ -84,3 +84,24 @@ class Ndn:
         if not encoded:
             return None 
         return encoded.decode()
+
+    def tlv_decode(self,raw): #sub TLV decode 
+        '''
+            T 8-bit
+            L 8-bit 
+            V variable 
+        '''
+        if raw is None or len(raw) <= 3:
+            return None, None, None
+        t = int(raw[0:1],16)
+        l = int(raw[1:2],16)
+        v = binascii.unhexlify( raw[2:] )
+        v = v.decode() if isinstance(v, (bytes)) else v
+
+        if l != len(v):
+            return None, None, None 
+        
+        return t, l, v 
+
+
+

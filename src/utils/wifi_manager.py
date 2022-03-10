@@ -13,6 +13,8 @@ class WifiManager(object):
             
         self.ssid = wifi_config['ssid']
         self.pwd = wifi_config['password']
+        self.wlan = network.WLAN(network.STA_IF)
+        self.wlan.active(True)
         self.ip = None 
     
     def ip(self):
@@ -39,24 +41,18 @@ class WifiManager(object):
         self.do_connect()
 
     def do_connect(self):
-        wlan = network.WLAN(network.STA_IF)
-        wlan.active(True)
-
         timeout = 120 #seconds 
-
-        if wlan.isconnected():
-            self.ip = wlan.ifconfig()
-            return True
-
-        wlan.connect(self.ssid, self.pwd)
-        c = 0
+        self.wlan.connect(self.ssid, self.pwd)
+        #c = 0
         while not wlan.isconnected():
-            time.sleep(1)
-            c = c + 1
-            print('.',end='')
-            if c > 30:
+            #c = c + 1
+            #print('.',end='')
+            if timeout <= 0:
                 print("connection failure!")
                 return False
+            timeout = timeout-1
+            time.sleep(1)
+
         self.ip = wlan.ifconfig()[0]
         print("connected! ", self.ip)
         return True

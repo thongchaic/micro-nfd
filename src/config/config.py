@@ -38,6 +38,15 @@ app_config = {
     'EKEY'      : '1728299357580462' 
 }
 
+mqtt_config = {
+    'server':'qrdee.co',
+    'port':1883,
+    'tls_enabled': False,
+    'username':'miot',
+    'password':'SrruMIoT@2019',
+    'client_id':'8a644714c8'
+}
+
 wifi_config = {
     'ssid':'PNHome2',
     'password':'st11ae58*'

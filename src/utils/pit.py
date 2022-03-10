@@ -30,7 +30,7 @@ class Pit:
             return True 
         return False 
     def daemon(self):
-        pass 
+        pass
+        #PIT timeout must be cleared 
 
-    
 

@@ -11,7 +11,7 @@ import urandom
 import ubinascii
 import machine
 import uhashlib
-# from wifi_manager import WifiManager
+from wifi_manager import WifiManager
 from config import * 
 #from experiments import ExperimentalData
 from ping import PingApp
@@ -31,9 +31,14 @@ class MicroNFD(object):
         self.mode = app_config['mode']
         
         #self.exp = ExperimentalData("data.csv")
-        self.fwd = Forwarder(self.UUID, device_config, lora_parameters, app_config)
+        self.fwd = Forwarder(self.UUID, device_config, lora_parameters, mqtt_config)
+        self.wifi = WifiManager(wifi_config)
 
-
+    # def gateway(self):
+    #     while True:
+    #         if not self.wifi.is_connected():
+    #             self.wifi.connect()
+    #         time.sleep(120)
 
     def mote(self):
         #bootstrap app 

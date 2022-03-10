@@ -9,11 +9,11 @@ from face_table import FaceTable
 from routes import Routes
 from pit import Pit
 from ndn import Ndn
-#from mqtt import MQTTx
+from mqtt import MQTTx
 #from cs import CS
 
 class Forwarder(object):
-    def __init__(self,uuid, device_config, lora_parameters, app_config):
+    def __init__(self,uuid, device_config, lora_parameters, mqtt_config):
         print("init...Forwarder....")
         self.stop = None 
         self.UUID=uuid 
@@ -27,8 +27,8 @@ class Forwarder(object):
         self.lora.onReceivedJoinData = self.onReceivedJoinData
         self.addFaceTable(self.lora.fid, self.lora)
 
-
-        self.mqttx = None # MQTTx(mqtt_config)
+        self.mqttx = MQTTx(2,uuid,mqtt_config)
+        self.addFaceTable(self.mqttx.fid, self.lora)
 
         self.i_buffer = [] #fix maximum recursion depth exceeded
         self.d_buffer = [] #fix maximum recursion depth exceeded
@@ -130,18 +130,19 @@ class Forwarder(object):
         while True:
             if self.lora:
                 self.lora.receive()
+            if self.mqttx:
+               self.mqttx.receive()
+
             if self.i_buffer:
                 i = self.i_buffer.pop(0)
                 self.sendInterest( i[0], i[1], i[2] )
             if self.d_buffer:
                 d = self.d_buffer.pop(0)
                 self.sendData( d[0],d[1],d[2] )
-            if self.mqttx:
-               self.mqttx.receive()
             
             #sec interval 
-            if (time.ticks_ms()-interval) > 30000:
-                if self.pit:
-                    self.pit.daemon()
-                interval = time.ticks_ms()
+            # if (time.ticks_ms()-interval) > 1000:
+            #     if self.pit:
+            #         self.pit.daemon()
+            #     interval = time.ticks_ms()
         

@@ -202,7 +202,8 @@ class SX127x:
         # clear IRQ's
         self.write_register(REG_IRQ_FLAGS, IRQ_TX_DONE_MASK)
 
-        self.collect_garbage()
+        #self.collect_garbage()
+        gc.collect()
 
     def write(self, buffer):
         currentLength = self.read_register(REG_PAYLOAD_LENGTH)
@@ -218,6 +219,7 @@ class SX127x:
         # update length
         self.write_register(REG_PAYLOAD_LENGTH, currentLength + size)
         return size
+
 
     def set_lock(self, lock = False):
         self._lock = lock
@@ -236,7 +238,8 @@ class SX127x:
         self.end_packet()
 
         self.set_lock(False) # unlock when done writing
-        self.collect_garbage()
+        #self.collect_garbage()
+        gc.collect()
 
     def get_irq_flags(self):
         irq_flags = self.read_register(REG_IRQ_FLAGS)
@@ -435,7 +438,8 @@ class SX127x:
             )
 
         self.set_lock(False)             # unlock in any case.
-        self.collect_garbage()
+        #self.collect_garbage()
+        gc.collect()
         return True
 
     def received_packet(self, size = 0):
@@ -481,7 +485,8 @@ class SX127x:
         for i in range(packet_length):
             payload.append(self.read_register(REG_FIFO))
 
-        self.collect_garbage()
+        #self.collect_garbage()
+        gc.collect()
         return bytes(payload)
 
     def read_register(self, address, byteorder = 'big', signed = False):
