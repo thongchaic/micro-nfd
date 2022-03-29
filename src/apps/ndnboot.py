@@ -14,3 +14,4 @@ class NDNBootstrap:
         elif _type == Ndn.JOIN_DATA:
             data = json.load(payload)
             self.app_config['EKEY'] = data['EKEY']
+    

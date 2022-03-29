@@ -21,6 +21,8 @@ import gc
 from ping import PingApp
 from ndnboot import NDNBootstrap
 
+#Face 1-10 preserves for internal use 
+
 class MicroNFD(object):
 
     def __init__(self):
@@ -42,7 +44,8 @@ class MicroNFD(object):
 
     def mote(self):
         #bootstrap app 
-        self.boot = NDNBootstrap(3,app_config)
+
+        self.boot = NDNBootstrap(11,app_config)
         self.fwd.addFaceTable(self.boot.fid, self.boot)
        
         #ping app 

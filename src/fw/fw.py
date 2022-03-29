@@ -10,6 +10,7 @@ from routes import Routes
 from pit import Pit
 from ndn import Ndn
 from mqtt import MQTTx
+from udp import UDP
 #from cs import CS
 
 class Forwarder(object):
@@ -30,6 +31,11 @@ class Forwarder(object):
         self.mqttx = MQTTx(2,uuid,mqtt_config)
         self.addFaceTable(self.mqttx.fid, self.lora)
 
+        self.udp = UDP(3,)
+        self.addFaceTable(self.udp.fid,self.udp)
+
+
+
         self.i_buffer = [] #fix maximum recursion depth exceeded
         self.d_buffer = [] #fix maximum recursion depth exceeded
         
@@ -46,21 +52,30 @@ class Forwarder(object):
     def forceSatisfied(self, name):
         self.pit.satisfied(name)
 
+    #Next hop 
     def onRecievedInterest(self,in_face, p_len, n_len, name, payload):
-        if name is None: #Unsolicited 
+        #Unsolicited 
+        if name is None: 
             return
         
-        #no cs implemented
-        #if self.cs.match()
-        
+       
         #pit 
         if self.pit.in_pit(name):
             return 
         #fwd interest 
+
+        #CS 
+        #no cs implemented
+        #if self.cs.match()
+        
         #self.routes.show()
+        #CS miss 
+        #
         if not self.routes.match(name):
             self.nack(in_face,name,'no routes')
             return
+
+        #Dispatch strategy => next hop 
         #exact match + broadcast strategy 
 
         self.i_buffer.append( (in_face,name,payload) )
@@ -131,7 +146,9 @@ class Forwarder(object):
             if self.lora:
                 self.lora.receive()
             if self.mqttx:
-               self.mqttx.receive()
+                self.mqttx.receive()
+            if self.udp:
+                self.udp.receive()
 
             if self.i_buffer:
                 i = self.i_buffer.pop(0)

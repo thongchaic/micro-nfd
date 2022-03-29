@@ -6,13 +6,12 @@ class PM25DustMonitoring: #PMS3003
     def __init__(self,fid):
 
         self.fid = fid
-        self.onReceivedJoinInterest = None 
-        self.onReceivedJoinData = None 
+        self.onReceivedData = None 
+        self.onRecievedInterest = None 
 
         self.pms = machine.UART(2,9600)
         self.pms.init(9600,bits=8,parity=None,stop=1)
         
-
     def send(self,_type,name,payload):
         if _type == Ndn.INTEREST:
             #process 
@@ -23,11 +22,15 @@ class PM25DustMonitoring: #PMS3003
             p_len = len(payload)
             n_len = len(name)
 
-            if self.onReceivedData: #return NDN Data  
-                self.onReceivedData(self.fid, p_len, n_len, name, payload)
+            if self.onRecievedInterest: #return NDN Data  
+                self.onRecievedInterest(self.fid, p_len, n_len, name, payload)
 
     def receive(self,_type,name,payload):
-        pass
+        if _type == Ndn.INTEREST:
+            print("Process intereesg ")
+            if self.onReceivedData:
+                self.onReceivedData(_type,name,payload)
+
 
     def calc_pms(self,x,y):
         pm25 = x

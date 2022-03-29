@@ -9,17 +9,11 @@ class RESTFul:
 
     def send(self,_type,name,payload):
         if _type == Ndn.DATA:
-            self.receive(_type,name,payload)
-            return 
-        if _type == Ndn.INTEREST:
-            #process and 
-            pass 
-
+            self.post(name, payload)
+        elif _type == Ndn.INTEREST:
+            self.get(payload)
         #Interest pkt received 
-        
-    def receive(self):
-        #Data pkt received 
-        pass 
+    
 
     def get(self,params): #paprams format: x=1&y=2.5
         rst = requests.get(self.URI+"?"+params)
