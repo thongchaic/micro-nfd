@@ -14,4 +14,4 @@ THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR I
 
 
 # Citation
-Thongchai Chuachan and Somnuk Puangpronpitag. "MicroNFD: A Named Forwarding Daemon in LoRa Networks". To appear in ICIC Express Letters: An International Journal of Research and Surveys, A(B): pp. X-Y, 2025.
+Thongchai Chuachan and Somnuk Puangpronpitag. "MicroNFD: A Named Forwarding Daemon in LoRa Networks". ICIC Express Letters: An International Journal of Research and Surveys, 20(3): pp. 333-343, 2026.
